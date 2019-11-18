@@ -18,22 +18,23 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.generate;
+package org.crown.projects.product.service.impl;
 
-import org.junit.Test;
+import org.crown.projects.product.model.entity.Image;
+import org.crown.projects.product.mapper.ImageMapper;
+import org.crown.projects.product.service.IImageService;
+import org.crown.framework.service.impl.BaseServiceImpl;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
- * MysqlGeneratorTest
+ * 存储所有图片信息 服务实现类
  * </p>
  *
  * @author whZhang
  */
-public class MysqlGeneratorTest {
+@Service
+        public class ImageServiceImpl extends BaseServiceImpl<ImageMapper, Image>implements IImageService {
 
-    @Test
-    public void generator() {
-        MysqlGenerator mysqlGenerator = new MysqlGenerator();
-        mysqlGenerator.generator("product_price","product");
-    }
-}
+        }

@@ -18,22 +18,18 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.generate;
+package org.crown.projects.product.service;
 
-import org.junit.Test;
+import org.crown.projects.product.model.entity.Product;
+import org.crown.framework.service.BaseService;
 
 /**
  * <p>
- * MysqlGeneratorTest
+ * 产品表 服务类
  * </p>
  *
  * @author whZhang
  */
-public class MysqlGeneratorTest {
+public interface IProductService extends BaseService<Product> {
 
-    @Test
-    public void generator() {
-        MysqlGenerator mysqlGenerator = new MysqlGenerator();
-        mysqlGenerator.generator("product_price","product");
-    }
-}
+        }

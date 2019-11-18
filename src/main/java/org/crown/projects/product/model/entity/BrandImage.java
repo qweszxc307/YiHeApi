@@ -18,22 +18,35 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.generate;
+package org.crown.projects.product.model.entity;
 
-import org.junit.Test;
+import com.baomidou.mybatisplus.annotation.TableName;
+import org.crown.framework.model.BaseModel;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 
 /**
  * <p>
- * MysqlGeneratorTest
+ * 品牌_图片关系表
  * </p>
  *
  * @author whZhang
  */
-public class MysqlGeneratorTest {
+@TableName("brand_image")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class BrandImage extends BaseModel {
 
-    @Test
-    public void generator() {
-        MysqlGenerator mysqlGenerator = new MysqlGenerator();
-        mysqlGenerator.generator("product_price","product");
-    }
+private static final long serialVersionUID=1L;
+
+    @ApiModelProperty(notes = "品牌id")
+private Integer bId;
+    @ApiModelProperty(notes = "图片id")
+private Integer imgId;
+
 }

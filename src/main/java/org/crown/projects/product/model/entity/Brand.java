@@ -18,22 +18,46 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.generate;
+package org.crown.projects.product.model.entity;
 
-import org.junit.Test;
+import com.baomidou.mybatisplus.annotation.TableName;
+import org.crown.framework.model.BaseModel;
+import java.time.LocalDateTime;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 
 /**
  * <p>
- * MysqlGeneratorTest
+ * 品牌表
  * </p>
  *
  * @author whZhang
  */
-public class MysqlGeneratorTest {
+@TableName("brand")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class Brand extends BaseModel {
 
-    @Test
-    public void generator() {
-        MysqlGenerator mysqlGenerator = new MysqlGenerator();
-        mysqlGenerator.generator("product_price","product");
-    }
+private static final long serialVersionUID=1L;
+
+    @ApiModelProperty(notes = "品牌名")
+private String name;
+    @ApiModelProperty(notes = "状态")
+private Integer status;
+    @ApiModelProperty(notes = "创建时间")
+private LocalDateTime createTime;
+    @ApiModelProperty(notes = "创建人")
+private Integer createUid;
+    @ApiModelProperty(notes = "修改时间")
+private LocalDateTime updateTime;
+    @ApiModelProperty(notes = "修改人")
+private Integer updateUid;
+    @ApiModelProperty(notes = "序号")
+private Integer orderNum;
+
 }

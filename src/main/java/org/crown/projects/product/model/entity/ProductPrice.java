@@ -18,22 +18,40 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.generate;
+package org.crown.projects.product.model.entity;
 
-import org.junit.Test;
+import java.math.BigDecimal;
+import com.baomidou.mybatisplus.annotation.TableName;
+import org.crown.framework.model.BaseModel;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 
 /**
  * <p>
- * MysqlGeneratorTest
+ * 产品价格配置表
  * </p>
  *
  * @author whZhang
  */
-public class MysqlGeneratorTest {
+@TableName("product_price")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class ProductPrice extends BaseModel {
 
-    @Test
-    public void generator() {
-        MysqlGenerator mysqlGenerator = new MysqlGenerator();
-        mysqlGenerator.generator("product_price","product");
-    }
+private static final long serialVersionUID=1L;
+
+    @ApiModelProperty(notes = "产品ID")
+private Integer pid;
+    @ApiModelProperty(notes = "起始区间值")
+private Integer sNum;
+    @ApiModelProperty(notes = "结束区间值")
+private Integer eNum;
+    @ApiModelProperty(notes = "价格")
+private BigDecimal price;
+
 }

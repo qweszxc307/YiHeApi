@@ -73,11 +73,11 @@ public class SuperGenerator {
     protected PackageConfig getPackageConfig(String pakageName) {
         return new PackageConfig()
                 .setParent("org.crown")
-                .setController("controller."+pakageName)
-                .setEntity("model."+pakageName+".entity")
-                .setMapper("mapper."+pakageName)
-                .setService("service."+pakageName)
-                .setServiceImpl("service."+pakageName+".impl");
+                .setController("projects."+pakageName+".controller")
+                .setEntity("projects."+pakageName+".model"+".entity")
+                .setMapper("projects."+pakageName+".mapper")
+                .setService("projects."+pakageName+".service")
+                .setServiceImpl("projects."+pakageName+".service.impl");
     }
 
     /**
