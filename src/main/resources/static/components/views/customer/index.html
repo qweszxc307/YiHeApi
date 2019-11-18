@@ -1,0 +1,176 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">客户管理</h2>
+        <span class="layui-breadcrumb pull-right">
+          <a href="#!console">首页</a>
+          <a><cite>客户</cite></a>
+        </span>
+    </div>
+    <div class="layui-card-body">
+        <!-- 搜索条件 -->
+        <div class="layui-form toolbar">
+            <form id="searchForm" onsubmit="return false;">
+                会员号查询：<input name="memberNum" class="layui-input search-input" type="text" placeholder="会员号"/>&emsp;
+                <div class="layui-inline">
+                    <label class="layui-form-label">会员等级</label>
+                    <div class="layui-input-inline">
+                        <select name="members" xm-select-radio="" xm-select-search="" xm-select="members"  lay-verify="required">
+                        </select>
+                    </div>
+                </div>
+                <button id="customer-btn-search" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索
+                </button>
+            </form>
+        </div>
+        <!-- 数据表格 -->
+        <table class="layui-table" id="customer-table" lay-filter="customer-table"></table>
+    </div>
+</div>
+
+<!-- 表单弹窗 -->
+<script type="text/html" id="member-model">
+    <form id="member-form" lay-filter="member-form" class="layui-form model-form">
+        <input name="id" type="hidden"/>
+        <div class="layui-inline">
+            <label class="layui-form-label">会员等级</label>
+            <div class="layui-input-inline">
+                <select name="member" xm-select-radio="" xm-select-search="" xm-select="member"  lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item model-form-footer">
+            <button class="layui-btn" lay-filter="member-form-submit" lay-submit>保存</button>
+        </div>
+    </form>
+</script>
+
+
+<!-- 表格操作列 -->
+<script type="text/html" id="customer-table-bar">
+    {{#  if({{detailShow}} == true){ }}
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">详情</a>
+    {{#  } }}
+    {{#  if({{updateShow}} == true){ }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="update">修改等级</a>
+    {{#  } }}
+</script>
+
+<script>
+    layui.use(['form', 'table', 'config', 'crown', 'formSelects'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.config;
+        var layer = layui.layer;
+        var crown = layui.crown;
+        var formSelects = layui.formSelects;
+        var $ = layui.jquery;
+
+
+        $('#customer-table-bar').vm({
+            detailShow: crown.hasPerm("customer:detail"),
+            updateShow: crown.hasPerm("customer:update")
+        });
+        //渲染表格
+        var customerTable = table.render({
+            elem: '#customer-table',
+
+            url: config.serverUrl + '/customer',
+            request: config.request,
+            parseData: config.parseData,
+            response: config.response,
+            headers: {Authorization: config.getToken()},
+            page: true,
+            cols: [[
+                {field: 'id', width: 80, sort: true, title: '序号'},
+                {field: 'nickName', align: 'center', title: '微信名称'},
+                {field: 'memberNum', align: 'center', title: '会员号'},
+                {field: 'memberName', align: 'center', sort: true, title: '会员等级'},
+                {field: 'bonus', align: 'center', sort: true, title: '佣金余额'},
+                {field: 'orderNum', align: 'center', sort: true, title: '成交订单数'},
+                {field: 'sum', align: 'center', sort: true, title: '成交金额'},
+                {align: 'center', toolbar: '#customer-table-bar', title: '操作'}
+            ]]
+        });
+
+
+
+        // 工具条点击事件
+        table.on('tool(customer-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') { //修改   查看详情
+                showDetailModel(data);
+            } else if (obj.event === 'update') { //删除
+                showUpdateModel(data);
+                debugger;
+            }
+        });
+
+        //
+        var showDetailModel = function (data) {
+            if (data) {
+                crown.get('/customer/' + data.id, {async: false}, function (data) {
+                    crown.putTempData('t_customer', data.result);
+                });
+            }
+            crown.popupCenter({
+                type: 1,
+                resize: true,
+                title: data ? '查看详情' : '未填写',
+                area: ['80%', '80%'],
+                offset: 'auto',
+                path: 'components/views/customer/form.html',
+                finish: function () {
+                    customerTable.reload('customer-table', {});
+                }
+            });
+        };
+        var members = new Array();
+        crown.get('/member', {}, function (data) {
+            var memberSelectData = new Array();
+            for (var i = 0; i < data.result.records.length; i++) {
+
+                memberSelectData.push({name: data.result.records[i].name, value: data.result.records[i].name})
+            }
+            formSelects.data('members', 'local', {arr: memberSelectData});
+            members = memberSelectData;
+        });
+        // 编辑客户等级显示编辑弹窗
+        // 显示编辑弹窗
+                var showUpdateModel = function (data) {
+                    debugger;
+                    layer.open({
+                        type: 1,
+                        area: '450px',
+                        offset: '120px',
+                        content: $('#member-model').html(),
+                        success: function () {
+                            debugger;
+                            form.val('member-form', data);
+                            formSelects.data('member', 'local', {arr: members});
+                        }
+                    });
+                    debugger;
+                };
+
+
+        // 表单提交事件
+        form.on('submit(member-form-submit)', function (data) {
+            debugger;
+            if (data.field.id) {
+                crown.put('/customer/' + data.field.id, {data: data.field}, function () {
+                    layer.closeAll('loading');
+                    layer.msg('修改成功', {icon: 1});
+                    customerTable.reload('customer-table');
+                    layer.closeAll('page');
+                });
+            }
+            return false;
+        });
+
+        // 搜索按钮点击事件
+        $('#customer-btn-search').click(function () {
+            customerTable.reload({where: crown.getSearchForm()});
+        });
+    });
+
+</script>
