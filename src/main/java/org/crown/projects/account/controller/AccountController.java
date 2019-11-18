@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class AccountController extends SuperController {
 
-
     @Resources(auth = AuthTypeEnum.OPEN)
     @ApiOperation("获取Token")
     @PostMapping(value = "/token")
