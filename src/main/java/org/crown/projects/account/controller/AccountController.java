@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
 public class AccountController extends SuperController {
+
     @Resources(auth = AuthTypeEnum.OPEN)
     @ApiOperation("获取Token")
     @PostMapping(value = "/token")
