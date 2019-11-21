@@ -20,31 +20,25 @@
  */
 package org.crown.projects.product.controller;
 
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
 import org.crown.enums.AuthTypeEnum;
+import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.product.model.dto.BrandDTO;
-import org.crown.projects.product.model.dto.ProductDTO;
 import org.crown.projects.product.model.entity.Brand;
 import org.crown.projects.product.model.entity.BrandImage;
 import org.crown.projects.product.model.entity.Image;
-import org.crown.projects.product.model.entity.Product;
 import org.crown.projects.product.service.IBrandImageService;
 import org.crown.projects.product.service.IBrandService;
 import org.crown.projects.product.service.IImageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-
-import io.swagger.annotations.Api;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.crown.framework.controller.SuperController;
 
 import java.util.ArrayList;
 import java.util.List;

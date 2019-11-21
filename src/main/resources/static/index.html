@@ -63,7 +63,8 @@
         var crown = layui.crown;
         // 检查是否登录
         if (!config.getToken() || config.getToken() == '') {
-            location.replace('login.html');
+            /*location.replace('login.html');*/
+            location.replace('swagger-ui.html');
             return;
         }
         // 获取当前用户信息

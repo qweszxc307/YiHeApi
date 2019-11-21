@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.crown</groupId>
-    <artifactId>crown</artifactId>
+    <artifactId>yihe-api</artifactId>
     <version>1.0</version>
 
     <name>YiHe</name>
@@ -199,7 +199,7 @@
     </dependencies>
 
     <build>
-        <finalName>crown</finalName>
+        <finalName>yihe-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

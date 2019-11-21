@@ -16,6 +16,10 @@ server:
   servlet:
     context-path: /
 spring:
+  servlet:
+    multipart:
+      maxFileSize: "100MB"
+      maxRequestSize: "10MB"
   jackson:
     time-zone: GMT+8
     serialization:
