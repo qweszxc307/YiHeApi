@@ -54,52 +54,5 @@ import java.util.Objects;
 @Validated
 public class ResourceRestController extends SuperController {
 
-    @Autowired
-    private IResourceService resourceService;
-
-    @Autowired
-    private ScanMappings scanMappings;
-
-    @Resources(auth = AuthTypeEnum.AUTH)
-    @ApiOperation(value = "查询所有资源(分页)")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "resourceName", value = "需要查询的资源名", paramType = "query"),
-            @ApiImplicitParam(name = "method", value = "需要查询的请求方式", paramType = "query"),
-            @ApiImplicitParam(name = "authType", value = "权限认证类型", paramType = "query")
-    })
-    @GetMapping
-    public ApiResponses<IPage<Resource>> page(@RequestParam(value = "resourceName", required = false) String resourceName,
-                                              @RequestParam(value = "method", required = false) String method,
-                                              @RequestParam(value = "authType", required = false) AuthTypeEnum authType
-    ) {
-        return success(
-                resourceService.query()
-                        .like(StringUtils.isNotEmpty(resourceName), Resource::getResourceName, resourceName)
-                        .eq(StringUtils.isNotEmpty(method), Resource::getMethod, method)
-                        .eq(Objects.nonNull(authType), Resource::getAuthType, authType)
-                        .page(this.<Resource>getPage())
-        );
-    }
-
-    @Resources(auth = AuthTypeEnum.AUTH)
-    @ApiOperation(value = "查询所有资源")
-    @GetMapping("/resources")
-    public ApiResponses<List<Resource>> list() {
-        return success(
-                resourceService.query()
-                .orderByAsc(Resource::getMethod)
-                .list()
-        );
-    }
-
-    @Resources(auth = AuthTypeEnum.AUTH)
-    @ApiOperation(value = "刷新资源")
-    @PutMapping
-    public ApiResponses<Void> refresh() {
-        scanMappings.doScan();
-        return success();
-    }
-
-
 }
 
