@@ -37,7 +37,7 @@ import lombok.NoArgsConstructor;
  *
  * @author whZhang
  */
-@TableName("classify")
+@TableName("product")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
