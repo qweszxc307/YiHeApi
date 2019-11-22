@@ -35,6 +35,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.lang.model.type.UnionType;
+
 /**
  * <p>
  * JWT token 生成工具类
@@ -48,6 +50,8 @@ public abstract class JWTUtils {
 
     public static final String UID = "uid";
     public static final String CODE = "code";
+    public static final String OPENID = "openId";
+    public static final String UNIONID = "unionId";
     private static final String SECRET = "WgtqaT1HNTZPZNMDJu3k";
     private static final long EXPIRE = 60 * 1000;
 
@@ -77,12 +81,16 @@ public abstract class JWTUtils {
      * @param code
      * @return
      */
-    public static String generate(String code) {
+    public static String generate(String code,String openId,String unionId) {
         Date nowDate = new Date();
         //过期时间
         Date expireDate = new Date(nowDate.getTime() + EXPIRE * 1000);
         Map<String, Object> claims = new HashMap<>(1);
         claims.put(CODE, code);
+        claims.put(OPENID, openId);
+        if(unionId != null){
+            claims.put(UNIONID, unionId);
+        }
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(nowDate)
@@ -129,6 +137,20 @@ public abstract class JWTUtils {
      */
     public static String getCode(String token) {
         return TypeUtils.castToString(getClaim(token).get(CODE));
+    }
+
+    /**
+     * 获取openId
+     */
+    public static String getOpenId(String token) {
+        return TypeUtils.castToString(getClaim(token).get(OPENID));
+    }
+
+    /**
+     * 获取unionId
+     */
+    public static String getUnionId(String token) {
+        return TypeUtils.castToString(getClaim(token).get(UNIONID));
     }
 
     /**
