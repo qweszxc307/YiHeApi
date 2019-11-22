@@ -18,7 +18,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.classify.controller;
+package org.crown.projects.main.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,13 +26,11 @@ import org.crown.common.annotations.Resources;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
-import org.crown.projects.classify.model.dto.BrandDTO;
-import org.crown.projects.classify.model.entity.Brand;
-import org.crown.projects.classify.model.entity.BrandImage;
+import org.crown.projects.classify.model.dto.ProductDTO;
 import org.crown.projects.classify.model.entity.Image;
-import org.crown.projects.classify.service.IBrandImageService;
-import org.crown.projects.classify.service.IBrandService;
+import org.crown.projects.classify.model.entity.Product;
 import org.crown.projects.classify.service.IImageService;
+import org.crown.projects.main.model.entity.ImageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -40,41 +38,35 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * <p>
- * 品牌表 前端控制器
+ * 存储所有图片信息 前端控制器
  * </p>
  *
  * @author whZhang
  */
-@Api(tags = {"Brand"}, description = "品牌表相关接口")
+@Api(tags = {"Image"}, description = "存储所有图片信息相关接口")
 @RestController
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
-public class BrandRestController extends SuperController {
-        @Autowired
-        IBrandService brandService;
-        @Autowired
-        IBrandImageService brandImageService;
-        @Autowired
-        IImageService imageService;
+public class MarketRecommendController extends SuperController {
+    @Autowired
+    private IImageService imageService;
 
-        @Resources(auth = AuthTypeEnum.AUTH)
-        @ApiOperation("查询品牌信息")
-        @GetMapping(value = "/brand")
-        public ApiResponses<List<BrandDTO>> get() {
-                List<BrandDTO> brandDTOList = brandService.query().eq(Brand::getStatus,0).entitys(
-                        e->{
-                                BrandDTO brandDTO = e.convert(BrandDTO.class);
-                                BrandImage brandImage = brandImageService.query().eq(BrandImage::getBId,e.getId()).getOne();
-                                Image image = imageService.query().eq(Image::getId,brandImage.getImgId()).getOne();
-                                brandDTO.setImgUrl(image.getImgUrl());
-                                return brandDTO;
-                        }
-                );
-                return success(brandDTOList);
-        }
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("查询分享返礼产品")
+    @GetMapping(value="/recommend/products")
+    public ApiResponses<List<ProductDTO>> getProducts() {
+       /* List<ImageDTO> list = imageService.query().eq(Image::getType,0) .entitys(
+                e -> {
+                        ImageDTO imageDTO = new ImageDTO();
+                        imageDTO.setId(e.getId());
+                        imageDTO.setImgUrl(e.getImgUrl());
+                        return imageDTO;
+                    });
+        return success(list);*/
+        return null;
+    }
 }

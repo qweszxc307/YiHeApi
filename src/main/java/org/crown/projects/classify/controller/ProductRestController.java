@@ -46,7 +46,9 @@ import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RestController;
 import org.crown.framework.controller.SuperController;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -58,7 +60,7 @@ import java.util.List;
  */
 @Api(tags = {"Product"}, description = "产品表相关接口")
 @RestController
-@RequestMapping(value = "/product", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
 public class ProductRestController extends SuperController {
         @Autowired
@@ -75,29 +77,30 @@ public class ProductRestController extends SuperController {
         @ApiImplicitParams({
                 @ApiImplicitParam(name = "id", value = "品牌ID", required = true, paramType = "path")
         })
-        @GetMapping("/{id}")
+        @GetMapping("/product/{id}")
         public ApiResponses<List<ProductDTO>> get(@PathVariable("id") Integer brandId) {
-                List<Product> productList = productService.query()
+                List<ProductDTO> productDTOList = productService.query()
                         .eq(Product::getStatus,0)
                         .eq(Product::getBrandId,brandId)
-                        .list();
-                List<ProductDTO> productDTOList = new ArrayList<>();
-                for(Product product: productList){
-                        ProductDTO productDTO = product.convert(ProductDTO.class);
-                        ProductImage productImage = productImageService.query()
-                                .eq(ProductImage::getPId,product.getId())
-                                .getOne();
-                        Image image = imageService.query()
-                                .eq(Image::getId,productImage.getImgId())
-                                .getOne();
-                        productDTO.setImgUrl(image.getImgUrl());
-                        ProductPrice productPrice = productPriceService.query()
-                                .eq(ProductPrice::getPid,product.getId())
-                                .orderByAsc(ProductPrice::getPrice)
-                                .getOne();
-                        productDTO.setPrice(productPrice.getPrice());
-                        productDTOList.add(productDTO);
-                }
+                        .notInSql(Product::getId, "select send_pid from market_recommend")
+                        .entitys(
+                                e -> {
+                                        ProductDTO productDTO = e.convert(ProductDTO.class);
+                                        ProductImage productImage = productImageService.query()
+                                                .eq(ProductImage::getPId,e.getId())
+                                                .getOne();
+                                        Image image = imageService.query()
+                                                .eq(Image::getId,productImage.getImgId())
+                                                .getOne();
+                                        productDTO.setImgUrl(image.getImgUrl());
+                                        ProductPrice productPrice = productPriceService.query()
+                                                .eq(ProductPrice::getPid,e.getId())
+                                                .orderByAsc(ProductPrice::getPrice)
+                                                .getOne();
+                                        productDTO.setPrice(productPrice.getPrice());
+                                        return productDTO;
+                                }
+                        );
                 return success(productDTOList);
         }
 }

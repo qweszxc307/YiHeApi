@@ -16,14 +16,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class WxUtils {
-    @Value("${wx.appId}")
-    private String appId;
 
-    @Value("${wx.secret}")
-    private String secret;
-
-    public static String getWxAccessToken(){
-        String result = HttpUtils.httpRequest("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET","GET",null);
+    /**
+     * 获取微信授权Token
+     */
+    public static String getWxAccessToken(String appId,String secret){
+        String result = HttpUtils.httpRequest("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+appId+"&secret="+secret,"GET",null);
         JSONObject resultObj = JSONObject.fromObject(result);
         String resultToken = "";
         if(resultObj.containsKey("access_token")){

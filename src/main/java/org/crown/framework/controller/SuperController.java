@@ -29,6 +29,7 @@ import org.crown.cons.PageCons;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.framework.utils.AntiSQLFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -39,6 +40,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * @author whZhang
  */
 public class SuperController {
+    @Value("${wx.appId}")
+    public String appId;
+
+    @Value("${wx.secret}")
+    public String secret;
+
 
     @Autowired
     protected HttpServletRequest request;
