@@ -69,3 +69,6 @@ qiniu:
   secretKey: SGEQW42gGP09ecTgWEa65n1_H81XsXQ-EadDRh6z
   bucket: boostech
   prefix: q0lhgg606.bkt.clouddn.com
+wx:
+  appId: wxe1ea0d8fff2ca373
+  secret: 12a393199e9b57d33e6ece02a8964be0
