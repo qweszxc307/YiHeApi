@@ -142,4 +142,13 @@ public class SuperController {
     protected String[] getParameterSafeValues(String parameter) {
         return AntiSQLFilter.getSafeValues(request.getParameterValues(parameter));
     }
+
+    /**
+     *  获取toekn
+    */
+    protected String getToken(){
+        String token = request.getHeader("Authorization")
+                .replace("Bearer ","");
+        return token;
+    }
 }
