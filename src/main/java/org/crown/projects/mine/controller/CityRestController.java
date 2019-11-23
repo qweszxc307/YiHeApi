@@ -20,6 +20,8 @@
  */
 package org.crown.projects.mine.controller;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
 import org.crown.enums.AuthTypeEnum;
@@ -34,6 +36,7 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 
 import io.swagger.annotations.Api;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.crown.framework.controller.SuperController;
 
@@ -51,15 +54,21 @@ import java.util.List;
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
 public class CityRestController extends SuperController {
-        @Autowired
-        private ICityService cityService;
+    @Autowired
+    private ICityService cityService;
+
+
+
 
         @Resources(auth = AuthTypeEnum.AUTH)
-        @ApiOperation("查询所有省信息")
-        @GetMapping(value="/city")
-        public ApiResponses<List<CityDTO>> city() {
-                List<City> list = cityService.query().eq(City::getLevel, "1").list();
+        @ApiOperation("省市区联动")
+        @ApiImplicitParams({
+                @ApiImplicitParam(name = "areaCode", value = "当前地名的编码", paramType = "query"),
 
-                return null;
+        })
+        @GetMapping(value = "/city/{areaCode}")
+        public ApiResponses<List<CityDTO>> lower(@RequestParam(value = "areaCode", required = false) String areaCode) {
+            return success(cityService.query().eq(City::getParentCode, areaCode).entitys(e -> e.convert(CityDTO.class)));
         }
 }
+

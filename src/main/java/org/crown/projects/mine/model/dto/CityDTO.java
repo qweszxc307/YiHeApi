@@ -40,7 +40,7 @@ import org.crown.framework.model.convert.Convert;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class CityDTO extends Convert  {
+public class CityDTO extends Convert {
 
     private static final long serialVersionUID = 1L;
 

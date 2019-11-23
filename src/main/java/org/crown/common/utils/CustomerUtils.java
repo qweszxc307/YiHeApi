@@ -13,8 +13,6 @@ public class CustomerUtils {
         Date now = new Date();
         Random r = new Random();
         int i1 = r.nextInt(99) + 100;
-
-
         return  (simpleDateFormat.format(now) + "").substring(2) + (now.getTime() + "").substring(4, 10) + (r.nextInt(899) + 100 + "");
 
     }

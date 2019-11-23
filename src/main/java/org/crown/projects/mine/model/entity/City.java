@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.framework.model.convert.Convert;
 
 
 /**
@@ -40,17 +41,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class City   {
+public class City  extends Convert {
 
     private static final long serialVersionUID = 1L;
     @ApiModelProperty(notes = "city_id")
-    private String cityId;
+    private Integer id;
     @ApiModelProperty(notes = "当前地名的编码")
     private String areaCode;
     @ApiModelProperty(notes = "地名")
     private String areaName;
-    @ApiModelProperty(notes = "级别")
-    private Integer level;
     @ApiModelProperty(notes = "上级地名的编码")
     private String parentCode;
     @ApiModelProperty(notes = "区域id")
