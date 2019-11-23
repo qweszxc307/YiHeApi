@@ -26,7 +26,7 @@ public class CustomerPARM extends Convert {
 
     @ApiModelProperty(notes = "性别")
     @NotNull(groups = {Update.class},message = "性别不能为空")
-    private String sex;
+    private Integer sex;
     @ApiModelProperty(notes = "昵称")
     @NotNull(groups = {Update.class},message = "昵称不能为空")
     private String nickName;

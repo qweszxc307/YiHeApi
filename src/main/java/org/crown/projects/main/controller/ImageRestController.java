@@ -28,7 +28,7 @@ import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.entity.Image;
 import org.crown.projects.classify.service.IImageService;
-import org.crown.projects.main.model.entity.ImageDTO;
+import org.crown.projects.main.model.dto.ImageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;

@@ -1,6 +1,8 @@
 package org.crown.projects.mine.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONObject;
 import org.crown.common.annotations.Resources;
@@ -10,12 +12,16 @@ import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
+import org.crown.projects.mine.model.dto.AcceptAddressDTO;
 import org.crown.projects.mine.model.dto.CustomerDTO;
+import org.crown.projects.mine.model.entity.AcceptAddress;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.model.entity.LabelBrand;
 import org.crown.projects.mine.model.entity.Member;
+import org.crown.projects.mine.model.parm.AcceptAddressPARM;
 import org.crown.projects.mine.model.parm.CustomerPARM;
 import org.crown.projects.mine.model.parm.TokenPARM;
+import org.crown.projects.mine.service.IAcceptAddressService;
 import org.crown.projects.mine.service.ICustomerService;
 import org.crown.projects.mine.service.ILabelBrandService;
 import org.crown.projects.mine.service.IMemberService;
@@ -46,6 +52,8 @@ public class AccountController extends SuperController {
     IMemberService memberService;
     @Autowired
     ILabelBrandService labelBrandService;
+    @Autowired
+    IAcceptAddressService acceptAddressService;
 
     @Resources(auth = AuthTypeEnum.OPEN)
     @ApiOperation("微信获取token")
@@ -119,14 +127,77 @@ public class AccountController extends SuperController {
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation("用户详情修改")
-    @PostMapping(value = "/user/detail")
-    public ApiResponses<CustomerDTO> detail(@RequestBody @Validated(CustomerPARM.Update.class) CustomerPARM customerPARM) {
+    @PutMapping(value = "/user/detail")
+    public ApiResponses<Void> detail(@RequestBody @Validated(CustomerPARM.Update.class) CustomerPARM customerPARM) {
         String openId = JWTUtils.getOpenId(getToken());
         Integer id = customerService.query().eq(Customer::getOpenId,openId).getOne().getId();
         Customer customer = customerPARM.convert(Customer.class);
         customer.setId(id);
         customerService.updateById(customer);
-        CustomerDTO customerDTO = customer.convert(CustomerDTO.class);
-        return success(customerDTO);
+        return success();
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("查询用户收件地址")
+    @GetMapping(value = "/express/address")
+    public ApiResponses<List<AcceptAddressDTO>> get() {
+        String openId = JWTUtils.getOpenId(getToken());
+        List<AcceptAddressDTO> acceptAddressDTOList = acceptAddressService.query().eq(AcceptAddress::getOpenid,openId).entitys(
+                e->{
+                    AcceptAddressDTO acceptAddressDTO = e.convert(AcceptAddressDTO.class);
+                    return acceptAddressDTO;
+                }
+        );
+        return success(acceptAddressDTOList);
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("新增收件地址")
+    @PostMapping(value = "/express/address")
+    public ApiResponses<Void> add(@RequestBody @Validated(AcceptAddressPARM.Create.class) AcceptAddressPARM acceptAddressPARM) {
+        String openId = JWTUtils.getOpenId(getToken());
+        Integer id =customerService.query().eq(Customer::getOpenId,openId).getOne().getId();
+        AcceptAddress acceptAddress = acceptAddressPARM.convert(AcceptAddress.class);
+        acceptAddress.setCId(id);
+        acceptAddress.setOpenid(openId);
+        acceptAddressService.save(acceptAddress);
+        return success();
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("修改收件地址")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "收件地址id", required = true, paramType = "path")
+    })
+    @PutMapping(value = "/express/address/{id}")
+    public ApiResponses<Void> update(@PathVariable("id") Integer id,@RequestBody @Validated(AcceptAddressPARM.Update.class) AcceptAddressPARM acceptAddressPARM) {
+        AcceptAddress acceptAddress = acceptAddressPARM.convert(AcceptAddress.class);
+        acceptAddress.setId(id);
+        acceptAddressService.updateById(acceptAddress);
+        return success();
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("删除收件地址")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "收件地址id", required = true, paramType = "path")
+    })
+    @DeleteMapping(value = "/express/address/{id}")
+    public ApiResponses<Void> delete(@PathVariable("id") Integer id) {
+        acceptAddressService.removeById(id);
+        return success();
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("设置默认收件地址")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "收件地址id", required = true, paramType = "path")
+    })
+    @PutMapping(value = "/express/address/status/{id}")
+    public ApiResponses<Void> status(@PathVariable("id") Integer id,@RequestBody @Validated(AcceptAddressPARM.Status.class) AcceptAddressPARM acceptAddressPARM) {
+        AcceptAddress acceptAddress = acceptAddressService.getById(id);
+        acceptAddress.setStatus(acceptAddressPARM.getStatus());
+        acceptAddressService.updateById(acceptAddress);
+        return success();
     }
 }

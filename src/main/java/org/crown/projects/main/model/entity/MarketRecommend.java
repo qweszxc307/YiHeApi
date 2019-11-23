@@ -18,7 +18,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.model.dto;
+package org.crown.projects.main.model.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -27,43 +27,55 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.enums.StatusEnum;
 import org.crown.framework.model.BaseModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 /**
  * <p>
- * 客户表
+ * 推荐返礼信息表
  * </p>
  *
  * @author whZhang
  */
+@TableName("market_recommend")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class CustomerDTO extends BaseModel {
+public class MarketRecommend extends BaseModel {
 
-    private static final long serialVersionUID = 1L;
+private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(notes = "会员号")
-    private String memberNum;
-    @ApiModelProperty(notes = "头像")
-    private String headImg;
-    @ApiModelProperty(notes = "会员等级名称")
-    private String memberName;
-    @ApiModelProperty(notes = "性别")
-    private Integer sex;
-    @ApiModelProperty(notes = "昵称")
-    private String nickName;
-    @ApiModelProperty(notes = "联系电话")
-    private String phone;
-    @ApiModelProperty(notes = "注册地址")
-    private String address;
-    @ApiModelProperty(notes = "喜欢品牌")
-    private List<String> labelBrandList;
-    @ApiModelProperty(notes = "喜欢类型")
-    private List<String> labelProductList;
+    @ApiModelProperty(notes = "会员等级")
+private Integer memberId;
+    @ApiModelProperty(notes = "参加活动商品id")
+private Integer activePid;
+    @ApiModelProperty(notes = "领取商品id")
+private Integer sendPid;
+    @ApiModelProperty(notes = "运费")
+private BigDecimal carriagePrice;
+    @ApiModelProperty(notes = "可领取人数")
+private Integer peopleNum;
+    @ApiModelProperty(notes = "领取商品后返现价格")
+private BigDecimal payReturnMoney;
+    @ApiModelProperty(notes = "购买指定商品后返现价格")
+private BigDecimal buyReturnMoney;
+    @ApiModelProperty(notes = "创建时间")
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+    @ApiModelProperty(notes = "创建人")
+    @TableField(fill = FieldFill.INSERT)
+    private Integer createUid;
+    @ApiModelProperty(notes = "修改时间")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+    @ApiModelProperty(notes = "修改人")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Integer updateUid;
+    @ApiModelProperty(notes = "状态")
+    private StatusEnum status;
+
 }

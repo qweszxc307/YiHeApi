@@ -1,4 +1,4 @@
-package org.crown.projects.main.model.entity;
+package org.crown.projects.main.model.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

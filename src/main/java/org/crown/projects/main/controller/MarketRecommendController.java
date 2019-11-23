@@ -26,11 +26,12 @@ import org.crown.common.annotations.Resources;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
-import org.crown.projects.classify.model.dto.ProductDTO;
-import org.crown.projects.classify.model.entity.Image;
-import org.crown.projects.classify.model.entity.Product;
 import org.crown.projects.classify.service.IImageService;
-import org.crown.projects.main.model.entity.ImageDTO;
+import org.crown.projects.classify.service.IProductImageService;
+import org.crown.projects.classify.service.IProductPriceService;
+import org.crown.projects.classify.service.IProductService;
+import org.crown.projects.main.model.dto.RecommendProductPageDTO;
+import org.crown.projects.main.services.IMarketRecommendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,19 +56,21 @@ import java.util.List;
 public class MarketRecommendController extends SuperController {
     @Autowired
     private IImageService imageService;
+    @Autowired
+    private IProductService productService;
+    @Autowired
+    private IProductImageService productImageService;
+    @Autowired
+    private IProductPriceService productPriceService;
+    @Autowired
+    private IMarketRecommendService marketRecommendService;
+
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation("查询分享返礼产品")
     @GetMapping(value="/recommend/products")
-    public ApiResponses<List<ProductDTO>> getProducts() {
-       /* List<ImageDTO> list = imageService.query().eq(Image::getType,0) .entitys(
-                e -> {
-                        ImageDTO imageDTO = new ImageDTO();
-                        imageDTO.setId(e.getId());
-                        imageDTO.setImgUrl(e.getImgUrl());
-                        return imageDTO;
-                    });
-        return success(list);*/
-        return null;
+    public ApiResponses<List<RecommendProductPageDTO>> get() {
+        List<RecommendProductPageDTO> list = marketRecommendService.selectRecommendProducts();
+        return success(list);
     }
 }

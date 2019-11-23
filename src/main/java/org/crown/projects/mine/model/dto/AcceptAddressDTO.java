@@ -27,43 +27,44 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.enums.StatusEnum;
 import org.crown.framework.model.BaseModel;
+import org.crown.framework.model.convert.Convert;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 /**
  * <p>
- * 客户表
+ * 收货地址表
  * </p>
  *
  * @author whZhang
  */
+@TableName("accept_address")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class CustomerDTO extends BaseModel {
+public class AcceptAddressDTO extends Convert {
 
-    private static final long serialVersionUID = 1L;
+private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(notes = "会员号")
-    private String memberNum;
-    @ApiModelProperty(notes = "头像")
-    private String headImg;
-    @ApiModelProperty(notes = "会员等级名称")
-    private String memberName;
-    @ApiModelProperty(notes = "性别")
-    private Integer sex;
-    @ApiModelProperty(notes = "昵称")
-    private String nickName;
-    @ApiModelProperty(notes = "联系电话")
-    private String phone;
-    @ApiModelProperty(notes = "注册地址")
-    private String address;
-    @ApiModelProperty(notes = "喜欢品牌")
-    private List<String> labelBrandList;
-    @ApiModelProperty(notes = "喜欢类型")
-    private List<String> labelProductList;
+    @ApiModelProperty(notes = "id")
+    private Integer id;
+    @ApiModelProperty(notes = "用户id")
+private Integer cId;
+    @ApiModelProperty(notes = "收货姓名")
+private String name;
+    @ApiModelProperty(notes = "手机号码")
+private String phone;
+    @ApiModelProperty(notes = "省")
+private String province;
+    @ApiModelProperty(notes = "市")
+private String city;
+    @ApiModelProperty(notes = "县(区)")
+private String district;
+    @ApiModelProperty(notes = "街道")
+private String street;
+    @ApiModelProperty(notes = "状态：(1默认，0不默认)")
+private StatusEnum status;
 }
