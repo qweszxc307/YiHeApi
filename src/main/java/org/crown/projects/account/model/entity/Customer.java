@@ -50,6 +50,7 @@ public class Customer extends BaseModel {
 
     @ApiModelProperty(notes = "id")
     private Integer id;
+
     @ApiModelProperty(notes = "会员号")
     private String memberNum;
     @ApiModelProperty(notes = "等级表id")
@@ -60,10 +61,18 @@ public class Customer extends BaseModel {
     private Integer orderNum;
     @ApiModelProperty(notes = "成交总金额")
     private BigDecimal sum;
-    @ApiModelProperty(notes = "openId")
-    private String openId;
-    @ApiModelProperty(notes = "unionId")
-    private String unionId;
+    @ApiModelProperty(notes = "微信名称")
+    private String nickName;
+    @ApiModelProperty(notes = "真实姓名")
+    private String name;
+    @ApiModelProperty(notes = "手机号")
+    private String phone;
+    @ApiModelProperty(notes = "性别")
+    private Integer sex;
+    @ApiModelProperty(notes = "地址")
+    private String address;
+    @ApiModelProperty(notes = "最后一次交易时间")
+    private LocalDateTime lastTime;
     /*
      * 创建时间
      */
@@ -74,8 +83,5 @@ public class Customer extends BaseModel {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
-    @ApiModelProperty(notes = "最后一次交易时间")
-    private LocalDateTime lastTime;
 
 }
