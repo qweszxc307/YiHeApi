@@ -66,7 +66,7 @@ public class CityRestController extends SuperController {
                 @ApiImplicitParam(name = "areaCode", value = "当前地名的编码", paramType = "query"),
 
         })
-        @GetMapping(value = "/city/{areaCode}")
+        @GetMapping(value = "/city")
         public ApiResponses<List<CityDTO>> lower(@RequestParam(value = "areaCode", required = false) String areaCode) {
             return success(cityService.query().eq(City::getParentCode, areaCode).entitys(e -> e.convert(CityDTO.class)));
         }
