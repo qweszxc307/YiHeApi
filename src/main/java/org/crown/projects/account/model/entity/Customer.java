@@ -50,7 +50,6 @@ public class Customer extends BaseModel {
 
     @ApiModelProperty(notes = "id")
     private Integer id;
-
     @ApiModelProperty(notes = "会员号")
     private String memberNum;
     @ApiModelProperty(notes = "等级表id")
