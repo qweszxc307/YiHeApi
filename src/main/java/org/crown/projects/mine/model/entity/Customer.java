@@ -18,7 +18,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.account.model.entity;
+package org.crown.projects.mine.model.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -38,7 +38,7 @@ import java.time.LocalDateTime;
  * 客户表
  * </p>
  *
- * @author ykMa
+ * @author whZhang
  */
 @TableName("customer")
 @Data
@@ -74,6 +74,8 @@ public class Customer extends BaseModel {
     private Integer sex;
     @ApiModelProperty(notes = "地址")
     private String address;
+    @ApiModelProperty(notes = "头像")
+    private String headImg;
     @ApiModelProperty(notes = "最后一次交易时间")
     private LocalDateTime lastTime;
     /*

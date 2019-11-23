@@ -18,22 +18,54 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.service.impl;
+package org.crown.projects.mine.model.entity;
 
-import org.crown.projects.mine.mapper.CityMapper;
-import org.crown.projects.mine.model.entity.City;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.service.ICityService;
-import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.crown.framework.model.BaseModel;
+
+import java.time.LocalDateTime;
+
 
 /**
  * <p>
- * 省，市，区，联动表 服务实现类
+ * 品牌标签表
+ *
  * </p>
  *
- * @author ykMa
+ * @author whZhang
  */
-@Service
-        public class CityServiceImpl extends BaseServiceImpl<CityMapper, City>implements ICityService {
+@TableName("label_brand")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class LabelBrand extends BaseModel {
 
-        }
+    private static final long serialVersionUID = 1L;
+    /**
+     * 主键id
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+    /**
+     * 品牌标签内容
+     */
+    private String name;
+    /**
+     * 更新时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    /**
+     * 标签状态 （0代表禁用，1代表开启）
+     */
+    private Integer status;
+}

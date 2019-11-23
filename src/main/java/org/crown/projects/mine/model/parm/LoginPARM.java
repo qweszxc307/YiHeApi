@@ -18,22 +18,36 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.service.impl;
+package org.crown.projects.mine.model.parm;
 
-import org.crown.projects.mine.mapper.CityMapper;
-import org.crown.projects.mine.model.entity.City;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.service.ICityService;
-import org.springframework.stereotype.Service;
+import javax.validation.constraints.NotBlank;
+
+import org.crown.framework.model.convert.Convert;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
- * 省，市，区，联动表 服务实现类
+ * 登陆参数
  * </p>
  *
- * @author ykMa
+ * @author whZhang
  */
-@Service
-        public class CityServiceImpl extends BaseServiceImpl<CityMapper, City>implements ICityService {
+@ApiModel
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class LoginPARM extends Convert {
 
-        }
+    @ApiModelProperty(notes = "微信名称")
+    @NotBlank(message = "用户名不能为空！")
+    private String nickName;
+
+    @ApiModelProperty(notes = "微信头像")
+    @NotBlank(message = "用户名不能为空！")
+    private String headImg;
+}

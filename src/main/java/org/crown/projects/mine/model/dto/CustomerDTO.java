@@ -18,36 +18,52 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.system.model.parm;
+package org.crown.projects.mine.model.dto;
 
-import javax.validation.constraints.NotBlank;
-
-import org.crown.framework.model.convert.Convert;
-
-import io.swagger.annotations.ApiModel;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.framework.model.BaseModel;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 /**
  * <p>
- * 登陆参数
+ * 客户表
  * </p>
  *
  * @author whZhang
  */
-@ApiModel
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class LoginPARM extends Convert {
+public class CustomerDTO extends BaseModel {
 
-    @ApiModelProperty(notes = "账号")
-    @NotBlank(message = "用户名不能为空！")
-    private String loginName;
-    @ApiModelProperty(notes = "密码")
-    @NotBlank(message = "密码不能为空！")
-    private String password;
+    private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(notes = "会员号")
+    private String memberNum;
+    @ApiModelProperty(notes = "头像")
+    private String headImg;
+    @ApiModelProperty(notes = "会员等级名称")
+    private String memberName;
+    @ApiModelProperty(notes = "性别")
+    private String sex;
+    @ApiModelProperty(notes = "昵称")
+    private String nickName;
+    @ApiModelProperty(notes = "联系电话")
+    private String phone;
+    @ApiModelProperty(notes = "注册地址")
+    private String address;
+    @ApiModelProperty(notes = "喜欢品牌")
+    private List<String> labelBrandList;
+    @ApiModelProperty(notes = "喜欢类型")
+    private List<String> labelProductList;
 }

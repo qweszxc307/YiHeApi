@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author whZhang
  */
-@Api(tags = {"Image"}, description = "存储所有图片信息相关接口")
+@Api(tags = {"首页"}, description = "分享返礼")
 @RestController
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated

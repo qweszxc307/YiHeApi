@@ -58,7 +58,7 @@ import java.util.List;
  *
  * @author whZhang
  */
-@Api(tags = {"Product"}, description = "产品表相关接口")
+@Api(tags = {"分类"}, description = "分类产品表相关接口")
 @RestController
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated

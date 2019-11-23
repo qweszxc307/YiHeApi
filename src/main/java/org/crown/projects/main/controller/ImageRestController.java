@@ -20,27 +20,22 @@
  */
 package org.crown.projects.main.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
 import org.crown.enums.AuthTypeEnum;
-import org.crown.enums.ImagesEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.entity.Image;
 import org.crown.projects.classify.service.IImageService;
 import org.crown.projects.main.model.entity.ImageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -50,7 +45,7 @@ import java.util.List;
  *
  * @author whZhang
  */
-@Api(tags = {"Image"}, description = "存储所有图片信息相关接口")
+@Api(tags = {"首页"}, description = "存储所有图片信息相关接口")
 @RestController
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated

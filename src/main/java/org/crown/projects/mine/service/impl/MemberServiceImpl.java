@@ -18,19 +18,23 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.account.services;
+package org.crown.projects.mine.service.impl;
 
 
-import org.crown.framework.service.BaseService;
-import org.crown.projects.account.model.entity.Customer;
+import org.crown.framework.service.impl.BaseServiceImpl;
+import org.crown.projects.mine.mapper.MemberMapper;
+import org.crown.projects.mine.model.entity.Member;
+import org.crown.projects.mine.service.IMemberService;
+import org.springframework.stereotype.Service;
 
 /**
  * <p>
- *  服务类
+ * 会员等级表 服务实现类
  * </p>
  *
  * @author ykMa
  */
-public interface ICustomerService extends BaseService<Customer> {
+@Service
+public class MemberServiceImpl extends BaseServiceImpl<MemberMapper, Member> implements IMemberService {
 
 }

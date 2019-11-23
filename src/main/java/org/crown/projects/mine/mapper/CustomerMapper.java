@@ -1,15 +1,15 @@
-package org.crown.projects.account.mapper;
+package org.crown.projects.mine.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.crown.framework.mapper.BaseMapper;
-import org.crown.projects.account.model.entity.Customer;
+import org.crown.projects.mine.model.entity.Customer;
 
 /**
  * <p>
  * Mapper 接口
  * </p>
  *
- * @author ykMa
+ * @author whZhang
  */
 @Mapper
 public interface CustomerMapper extends BaseMapper<Customer> {

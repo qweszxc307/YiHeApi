@@ -23,6 +23,7 @@ package org.crown.projects.classify.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
+import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
@@ -40,7 +41,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,7 +50,7 @@ import java.util.List;
  *
  * @author whZhang
  */
-@Api(tags = {"Brand"}, description = "品牌表相关接口")
+@Api(tags = {"分类"}, description = "分类品牌表相关接口")
 @RestController
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
@@ -66,7 +66,7 @@ public class BrandRestController extends SuperController {
         @ApiOperation("查询品牌信息")
         @GetMapping(value = "/brand")
         public ApiResponses<List<BrandDTO>> get() {
-                List<BrandDTO> brandDTOList = brandService.query().eq(Brand::getStatus,0).entitys(
+            List<BrandDTO> brandDTOList = brandService.query().eq(Brand::getStatus,0).entitys(
                         e->{
                                 BrandDTO brandDTO = e.convert(BrandDTO.class);
                                 BrandImage brandImage = brandImageService.query().eq(BrandImage::getBId,e.getId()).getOne();

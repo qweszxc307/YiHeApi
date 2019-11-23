@@ -18,25 +18,19 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.account.services.impl;
+package org.crown.projects.mine.service;
 
-import lombok.extern.log4j.Log4j2;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.account.mapper.CustomerMapper;
-import org.crown.projects.account.model.entity.Customer;
-import org.crown.projects.account.services.ICustomerService;
-import org.springframework.stereotype.Service;
 
+import org.crown.framework.service.BaseService;
+import org.crown.projects.mine.model.entity.Customer;
 
 /**
  * <p>
- * 服务实现类
+ *  服务类
  * </p>
  *
- * @author ykMa
+ * @author whZhang
  */
-@Log4j2
-@Service
-public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
+public interface ICustomerService extends BaseService<Customer> {
 
 }

@@ -20,20 +20,20 @@
  */
 package org.crown.projects.mine.service.impl;
 
-import org.crown.projects.mine.mapper.CityMapper;
-import org.crown.projects.mine.model.entity.City;
 import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.service.ICityService;
+import org.crown.projects.mine.mapper.LabelBrandMapper;
+import org.crown.projects.mine.model.entity.LabelBrand;
+import org.crown.projects.mine.service.ILabelBrandService;
 import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 省，市，区，联动表 服务实现类
+ * 品牌标签表
+ 服务实现类
  * </p>
  *
- * @author ykMa
+ * @author whZhang
  */
 @Service
-        public class CityServiceImpl extends BaseServiceImpl<CityMapper, City>implements ICityService {
-
-        }
+public class LabelBrandServiceImpl extends BaseServiceImpl<LabelBrandMapper, LabelBrand> implements ILabelBrandService {
+}

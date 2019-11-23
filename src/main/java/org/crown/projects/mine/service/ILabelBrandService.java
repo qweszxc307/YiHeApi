@@ -18,22 +18,18 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.service.impl;
+package org.crown.projects.mine.service;
 
-import org.crown.projects.mine.mapper.CityMapper;
-import org.crown.projects.mine.model.entity.City;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.service.ICityService;
-import org.springframework.stereotype.Service;
+import org.crown.framework.service.BaseService;
+import org.crown.projects.mine.model.entity.LabelBrand;
 
 /**
  * <p>
- * 省，市，区，联动表 服务实现类
+ * 品牌标签表
+ 服务类
  * </p>
  *
- * @author ykMa
+ * @author whZhang
  */
-@Service
-        public class CityServiceImpl extends BaseServiceImpl<CityMapper, City>implements ICityService {
-
-        }
+public interface ILabelBrandService extends BaseService<LabelBrand> {
+}

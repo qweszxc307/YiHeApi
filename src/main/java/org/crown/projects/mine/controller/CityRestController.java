@@ -28,7 +28,7 @@ import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.mine.model.dto.CityDTO;
 import org.crown.projects.mine.model.entity.City;
-import org.crown.projects.mine.service.impl.ICityService;
+import org.crown.projects.mine.service.ICityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author ykMa
  */
-@Api(tags = {"City"}, description = "省，市，区，联动表相关接口")
+@Api(tags = {"我的"}, description = "省，市，区，联动表相关接口")
 @RestController
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated

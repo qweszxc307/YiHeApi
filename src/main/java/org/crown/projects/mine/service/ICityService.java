@@ -18,7 +18,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.service.impl;
+package org.crown.projects.mine.service;
 
 import org.crown.framework.service.BaseService;
 import org.crown.projects.mine.model.entity.City;

@@ -20,20 +20,23 @@
  */
 package org.crown.projects.mine.service.impl;
 
-import org.crown.projects.mine.mapper.CityMapper;
-import org.crown.projects.mine.model.entity.City;
+import lombok.extern.log4j.Log4j2;
 import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.service.ICityService;
+import org.crown.projects.mine.mapper.CustomerMapper;
+import org.crown.projects.mine.model.entity.Customer;
+import org.crown.projects.mine.service.ICustomerService;
 import org.springframework.stereotype.Service;
+
 
 /**
  * <p>
- * 省，市，区，联动表 服务实现类
+ * 服务实现类
  * </p>
  *
  * @author ykMa
  */
+@Log4j2
 @Service
-        public class CityServiceImpl extends BaseServiceImpl<CityMapper, City>implements ICityService {
+public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
 
-        }
+}
