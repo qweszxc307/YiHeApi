@@ -137,4 +137,3 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestReport
-apply plugin: 'maven'
