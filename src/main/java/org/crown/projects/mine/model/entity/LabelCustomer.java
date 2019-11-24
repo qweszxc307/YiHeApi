@@ -18,52 +18,43 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.model.dto;
+package org.crown.projects.mine.model.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import org.crown.framework.model.BaseModel;
+
+import java.time.LocalDateTime;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.crown.framework.model.BaseModel;
-import org.crown.projects.mine.model.entity.LabelBrand;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 
 /**
  * <p>
- * 客户表
+ *
  * </p>
  *
- * @author whZhang
+ * @author ykMa
  */
+@TableName("label_customer")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class CustomerDTO extends BaseModel {
+public class LabelCustomer extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(notes = "会员号")
-    private String memberNum;
-    @ApiModelProperty(notes = "头像")
-    private String headImg;
-    @ApiModelProperty(notes = "会员等级名称")
-    private String memberName;
-    @ApiModelProperty(notes = "性别")
-    private Integer sex;
-    @ApiModelProperty(notes = "昵称")
-    private String nickName;
-    @ApiModelProperty(notes = "联系电话")
-    private String phone;
-    @ApiModelProperty(notes = "注册地址")
-    private String address;
-    @ApiModelProperty(notes = "喜欢品牌")
-    private List<LabelBrandDTO> labelBrandList;
+    @ApiModelProperty(notes = "会员id")
+    private Integer customerId;
+    @ApiModelProperty(notes = "标签id")
+    private Integer labelId;
+    @ApiModelProperty(notes = "标签类型id")
+    private Integer labelBrandId;
+    @ApiModelProperty(notes = "更新时间")
+    private LocalDateTime updateTime;
+    @ApiModelProperty(notes = "创建时间")
+    private LocalDateTime createTime;
 
 }

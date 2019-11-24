@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,9 +56,6 @@ public class CityRestController extends SuperController {
     @Autowired
     private ICityService cityService;
 
-
-
-
         @Resources(auth = AuthTypeEnum.AUTH)
         @ApiOperation("省市区联动")
         @ApiImplicitParams({
@@ -71,4 +67,3 @@ public class CityRestController extends SuperController {
             return success(cityService.query().eq(City::getParentCode, areaCode).entitys(e -> e.convert(CityDTO.class)));
         }
 }
-

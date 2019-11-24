@@ -14,17 +14,13 @@ import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
 import org.crown.projects.mine.model.dto.CustomerDTO;
-import org.crown.projects.mine.model.entity.AcceptAddress;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.model.entity.LabelBrand;
-import org.crown.projects.mine.model.entity.Member;
+import org.crown.projects.mine.model.dto.LabelBrandDTO;
+import org.crown.projects.mine.model.dto.LabelDTO;
+import org.crown.projects.mine.model.entity.*;
 import org.crown.projects.mine.model.parm.AcceptAddressPARM;
 import org.crown.projects.mine.model.parm.CustomerPARM;
 import org.crown.projects.mine.model.parm.TokenPARM;
-import org.crown.projects.mine.service.IAcceptAddressService;
-import org.crown.projects.mine.service.ICustomerService;
-import org.crown.projects.mine.service.ILabelBrandService;
-import org.crown.projects.mine.service.IMemberService;
+import org.crown.projects.mine.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @version V1.0
@@ -54,6 +51,8 @@ public class AccountController extends SuperController {
     ILabelBrandService labelBrandService;
     @Autowired
     IAcceptAddressService acceptAddressService;
+    @Autowired
+    private ILabelService labelService;
 
     @Resources(auth = AuthTypeEnum.OPEN)
     @ApiOperation("微信获取token")
@@ -115,8 +114,11 @@ public class AccountController extends SuperController {
                     Member member = memberService.query().eq(Member::getId,e.getMId()).getOne();
                     CustomerDTO result = e.convert(CustomerDTO.class);
                     result.setMemberName(member.getName());
-                    List<String> brandLabelList = labelBrandService.query().eq(LabelBrand::getStatus,0).entitys(f->{
-                        return f.getName();
+                    List<LabelBrandDTO> brandLabelList = labelBrandService.query().eq(LabelBrand::getStatus,0).entitys(f-> {
+                        LabelBrandDTO convert = f.convert(LabelBrandDTO.class);
+                        Integer brandId = convert.getId();
+                        convert.setLabels(labelService.queryLabelByOpenId(openId, brandId));
+                        return convert;
                     });
                     result.setLabelBrandList(brandLabelList);
                     return result;
@@ -200,4 +202,27 @@ public class AccountController extends SuperController {
         acceptAddressService.updateById(acceptAddress);
         return success();
     }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("查询所有标签类型下的所有标签")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "标签类型id", required = true, paramType = "path")
+    })
+    @GetMapping(value = "/user/label/{id}")
+    public ApiResponses<List<LabelDTO>> getLabel(@PathVariable("id") Integer id) {
+        return success(labelService.query().eq(Objects.nonNull(id), Label::getBrandId, id).entitys(e -> e.convert(LabelDTO.class)));
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("修改标签")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "标签类型id", required = true, paramType = "path")
+    })
+    @PutMapping(value = "/user/label/{id}")
+    public ApiResponses<Void> updateLabel(@PathVariable("id") Integer id, @RequestBody List<LabelDTO> labelDTOS) {
+        String openId = JWTUtils.getOpenId(getToken());
+        labelService.updateLabel(id, labelDTOS, openId);
+        return success();
+    }
+
 }
