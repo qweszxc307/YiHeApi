@@ -20,9 +20,7 @@
  */
 package org.crown.framework.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.crown.common.utils.ApiUtils;
 import org.crown.common.utils.TypeUtils;
 import org.crown.cons.PageCons;
@@ -32,7 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * SuperController
@@ -45,6 +44,20 @@ public class SuperController {
 
     @Value("${wx.secret}")
     public String secret;
+    //微信支付的商户id
+    @Value("${wx.mchId}")
+    public static final String mch_id = "";
+    //微信支付的商户密钥
+    @Value("${wx.key}")
+    public static final String key = "";
+    //支付成功后的服务器回调url，这里填PayController里的回调函数地址
+    public static final String notify_url = "";
+    //签名方式，固定值
+    public static final String SIGNTYPE = "MD5";
+    //交易类型，小程序支付的固定值为JSAPI
+    public static final String TRADETYPE = "JSAPI";
+    //微信统一下单接口地址
+    public static final String pay_url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
 
     @Autowired
