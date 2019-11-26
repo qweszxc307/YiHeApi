@@ -21,21 +21,24 @@
 package org.crown.projects.main.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.entity.Image;
+import org.crown.projects.classify.model.entity.ProductImage;
 import org.crown.projects.classify.service.IImageService;
+import org.crown.projects.classify.service.IProductImageService;
 import org.crown.projects.main.model.dto.ImageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,9 +55,11 @@ import java.util.List;
 public class ImageRestController extends SuperController {
     @Autowired
     private IImageService imageService;
+    @Autowired
+    private IProductImageService productImageService;
 
     @Resources(auth = AuthTypeEnum.AUTH)
-    @ApiOperation("查询轮播图")
+    @ApiOperation("查询首页轮播图")
     @GetMapping(value="/image")
     public ApiResponses<List<ImageDTO>> images() {
         List<ImageDTO> list = imageService.query().eq(Image::getType,0) .entitys(
@@ -65,5 +70,22 @@ public class ImageRestController extends SuperController {
                         return imageDTO;
                     });
         return success(list);
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("查询产品信息图片")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "产品ID", required = true, paramType = "path")
+    })
+    @GetMapping(value="/{id}/image")
+    public ApiResponses<List<ImageDTO>> productImages(@PathVariable("id") Integer id) {
+        List<ProductImage> productImageList = productImageService.query().eq(ProductImage::getPId,id).list();
+        List<ImageDTO> imageDTOList = new ArrayList<>();
+        for(ProductImage productImage : productImageList){
+            Integer imgId = productImage.getImgId();
+            ImageDTO imageDTO = imageService.getById(imgId).convert(ImageDTO.class);
+            imageDTOList.add(imageDTO);
+        }
+        return success(imageDTOList);
     }
 }

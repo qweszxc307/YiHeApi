@@ -27,6 +27,7 @@ import org.crown.common.annotations.Resources;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.dto.ProductDTO;
+import org.crown.projects.classify.model.dto.ProductPriceDTO;
 import org.crown.projects.classify.model.entity.Image;
 import org.crown.projects.classify.model.entity.Product;
 import org.crown.projects.classify.model.entity.ProductImage;
@@ -73,7 +74,7 @@ public class ProductRestController extends SuperController {
         IProductPriceService productPriceService;
 
         @Resources(auth = AuthTypeEnum.AUTH)
-        @ApiOperation("查询品牌对应产品信息")
+        @ApiOperation("查询品牌对应产品列表")
         @ApiImplicitParams({
                 @ApiImplicitParam(name = "id", value = "品牌ID", required = true, paramType = "path")
         })
@@ -94,13 +95,30 @@ public class ProductRestController extends SuperController {
                                                 .getOne();
                                         productDTO.setImgUrl(image.getImgUrl());
                                         ProductPrice productPrice = productPriceService.query()
-                                                .eq(ProductPrice::getPid,e.getId())
-                                                .orderByAsc(ProductPrice::getPrice)
-                                                .getOne();
+                                            .eq(ProductPrice::getPid,e.getId())
+                                            .orderByAsc(ProductPrice::getPrice)
+                                            .getOne();
                                         productDTO.setPrice(productPrice.getPrice());
                                         return productDTO;
                                 }
                         );
                 return success(productDTOList);
         }
+
+        @Resources(auth = AuthTypeEnum.AUTH)
+        @ApiOperation("查询相关产品的价格区间")
+        @ApiImplicitParams({
+                @ApiImplicitParam(name = "id", value = "产品ID", required = true, paramType = "path")
+        })
+        @GetMapping("/product/prices/{id}")
+        public ApiResponses<List<ProductPriceDTO>> getPricesById(@PathVariable("id") Integer productId) {
+            List<ProductPriceDTO> productPriceDTOList = productPriceService.query().eq(ProductPrice::getPid,productId).entitys(
+                    e->{
+                        return e.convert(ProductPriceDTO.class);
+                    }
+            );
+            return success(productPriceDTOList);
+        }
+
+
 }

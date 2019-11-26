@@ -18,36 +18,35 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.model.parm;
+package org.crown.projects.main.model.dto;
 
-import javax.validation.constraints.NotBlank;
-
-import org.crown.framework.model.convert.Convert;
-
-import io.swagger.annotations.ApiModel;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.framework.model.BaseModel;
+
 
 /**
  * <p>
- * 登陆参数
+ * 推荐返礼用户信息表
  * </p>
  *
  * @author whZhang
  */
-@ApiModel
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class LoginPARM extends Convert {
+public class RecommendCustomerDTO extends BaseModel {
 
-    @ApiModelProperty(notes = "微信名称")
-    @NotBlank(message = "用户名不能为空！")
-    private String nickName;
+private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(notes = "微信头像")
-    @NotBlank(message = "用户名不能为空！")
-    private String headImg;
+    @ApiModelProperty(notes = "产品id")
+private Integer pId;
+    @ApiModelProperty(notes = "推荐人id")
+private String shareOpenid;
+    @ApiModelProperty(notes = "当前用户id")
+private String currentOpenid;
+
 }

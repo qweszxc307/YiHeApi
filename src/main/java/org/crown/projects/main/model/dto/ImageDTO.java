@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.enums.ImagesEnum;
+import org.crown.enums.StatusEnum;
 import org.crown.framework.model.convert.Convert;
 
 /**
@@ -26,4 +28,6 @@ public class ImageDTO extends Convert {
     private Integer id;
     @ApiModelProperty(notes = "imgUrl")
     private String imgUrl;
+    @ApiModelProperty(notes = "图片类型(0:轮播图;1:品牌图片;2:产品图片;3:产品详情图片")
+    private ImagesEnum type;
 }

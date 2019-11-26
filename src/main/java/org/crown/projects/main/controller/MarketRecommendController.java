@@ -21,25 +21,23 @@
 package org.crown.projects.main.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
+import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
-import org.crown.projects.classify.service.IImageService;
-import org.crown.projects.classify.service.IProductImageService;
-import org.crown.projects.classify.service.IProductPriceService;
-import org.crown.projects.classify.service.IProductService;
 import org.crown.projects.main.model.dto.RecommendProductPageDTO;
+import org.crown.projects.main.model.entity.RecommendCustomer;
 import org.crown.projects.main.services.IMarketRecommendService;
+import org.crown.projects.main.services.IRecommendCustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,15 +53,10 @@ import java.util.List;
 @Validated
 public class MarketRecommendController extends SuperController {
     @Autowired
-    private IImageService imageService;
-    @Autowired
-    private IProductService productService;
-    @Autowired
-    private IProductImageService productImageService;
-    @Autowired
-    private IProductPriceService productPriceService;
-    @Autowired
     private IMarketRecommendService marketRecommendService;
+
+    @Autowired
+    private IRecommendCustomerService recommendCustomerService;
 
 
     @Resources(auth = AuthTypeEnum.AUTH)
@@ -72,5 +65,20 @@ public class MarketRecommendController extends SuperController {
     public ApiResponses<List<RecommendProductPageDTO>> get() {
         List<RecommendProductPageDTO> list = marketRecommendService.selectRecommendProducts();
         return success(list);
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("添加分享返利用户相关信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderId", value = "订单ID", required = true, paramType = "path")
+    })
+    @GetMapping(value="/recommend/customer/{orderId}")
+    public ApiResponses<Void> add(@PathVariable("orderId") Integer orderId) {
+        String openId = JWTUtils.getOpenId(getToken());
+        RecommendCustomer recommendCustomer = new RecommendCustomer();
+        recommendCustomer.setOrderId(orderId);
+        recommendCustomer.setCurrentOpenid(openId);
+        recommendCustomerService.save(recommendCustomer);
+        return success();
     }
 }
