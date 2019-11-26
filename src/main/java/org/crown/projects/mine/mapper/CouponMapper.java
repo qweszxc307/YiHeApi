@@ -20,4 +20,6 @@ public interface CouponMapper extends BaseMapper<Coupon> {
 
     List<CouponDTO> queryMyCoupon(@Param("openId") String openId);
 
+    void deleteCouponCustomerById(@Param("id") Integer id);
+
 }

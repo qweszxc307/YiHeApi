@@ -40,5 +40,5 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param configId
      * @return
      */
-    BigDecimal queryConfigById(Integer configId);
+    BigDecimal queryConfigById(@Param("configId") Integer configId);
 }

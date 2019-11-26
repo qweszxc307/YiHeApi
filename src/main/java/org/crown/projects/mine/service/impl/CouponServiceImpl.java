@@ -44,4 +44,8 @@ public class CouponServiceImpl extends BaseServiceImpl<CouponMapper, Coupon> imp
 
     }
 
+    @Override
+    public void deleteCouponCustomerById(Integer id) {
+        baseMapper.deleteCouponCustomerById(id);
+    }
 }

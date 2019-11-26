@@ -13,4 +13,5 @@ import org.crown.projects.mine.model.entity.Customer;
  */
 @Mapper
 public interface CustomerMapper extends BaseMapper<Customer> {
+    Integer deleteCoupon(String openId);
 }

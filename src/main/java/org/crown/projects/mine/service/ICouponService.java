@@ -40,4 +40,10 @@ public interface ICouponService extends BaseService<Coupon> {
      * @return
      */
     List<CouponDTO> queryMyCoupon(String openId);
+
+    /**
+     * 删除优惠券
+     * @param id
+     */
+    void deleteCouponCustomerById(Integer id);
 }

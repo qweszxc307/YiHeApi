@@ -20,6 +20,8 @@ WHERE
 	AND cac.carriage_id = ( SELECT pc.cid FROM product_carriage pc WHERE pc.pid = 13 )
 	)
 </select>
-
+<select id="queryConfigById" parameterType="Integer" resultType="BigDecimal">
+	select free_price from carriage_config where  id = #{configId}
+</select>
 
 </mapper>

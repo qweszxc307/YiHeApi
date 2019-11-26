@@ -26,7 +26,6 @@ import org.crown.projects.mine.mapper.CustomerMapper;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.service.ICustomerService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -39,13 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Log4j2
 @Service
 public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
-    /**
-     * 删除优惠券
-     *
-     * @param openId
-     */
-    @Transactional(readOnly = false)
-    public void deleteCoupon(String openId) {
 
-    }
 }
+

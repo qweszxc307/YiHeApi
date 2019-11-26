@@ -34,7 +34,7 @@ import org.crown.projects.mine.model.dto.AcceptAddressDTO;
 import org.crown.projects.mine.model.dto.CouponDTO;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.service.IAcceptAddressService;
-import org.crown.projects.mine.service.impl.CustomerServiceImpl;
+import org.crown.projects.mine.service.ICouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,8 +56,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     @Autowired
     private IOrderLogisticsService orderLogisticsService;
     @Autowired
-    private CustomerServiceImpl customerService;
-
+    private ICouponService couponService;
 
     @Override
     public BigDecimal queryPostFee(Integer num, Integer addId, Integer productId, BigDecimal prices) {
@@ -79,7 +78,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             }
         }
 
-        return null;
+        return new BigDecimal("100");
     }
 
     /**
@@ -133,7 +132,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
                 order.setDiscountPrice((product.getPrice().multiply(new BigDecimal(product.getNum() + ""))).subtract(coupon.getDiscountPoint()));
             }
             //优惠券数量减少
-            customerService.deleteCoupon(customer.getOpenId());
+            couponService.deleteCouponCustomerById(coupon.getId());
+
         }
         //保存订单
         save(order);

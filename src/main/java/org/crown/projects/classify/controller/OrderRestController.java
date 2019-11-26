@@ -53,41 +53,42 @@ import java.math.BigDecimal;
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
 public class OrderRestController extends SuperController {
-        @Autowired
-        private IOrderService orderService;
-        @Autowired
-        private ICustomerService customerService;
+    @Autowired
+    private IOrderService orderService;
+    @Autowired
+    private ICustomerService customerService;
 
-        @Resources(auth = AuthTypeEnum.AUTH)
-        @ApiOperation("查询运费")
-        @GetMapping(value = "/postFee")
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("查询运费")
+    @GetMapping(value = "/postFee")
 
-        /**
-         * 购买数量，地址id，产品id，商品总价格
-         */
-        public ApiResponses<BigDecimal> get(@RequestBody Integer num,
-                                            @RequestBody Integer addId,
-                                            @RequestBody Integer productId,
-                                            @RequestBody BigDecimal prices) {
-                return success(orderService.queryPostFee(num, addId, productId, prices));
-        }
+    /**
+     * 购买数量，地址id，产品id，商品总价格
+     */
+    public ApiResponses<BigDecimal> get(@RequestParam Integer num,
+                                        @RequestParam Integer addId,
+                                        @RequestParam Integer productId,
+                                        @RequestParam BigDecimal prices) {
+        BigDecimal postFee = orderService.queryPostFee(num, addId, productId, prices);
+        return success(postFee);
+    }
 
-        @Resources(auth = AuthTypeEnum.AUTH)
-        @ApiOperation("下单接口")
-        @PostMapping(value = "/order")
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("下单接口")
+    @PostMapping(value = "/order")
 
-        /**
-         * 邮费，商品信息，收货地址对象 订单价格，
-         */
-        public ApiResponses<OrderDTO> createOrder(@RequestBody BigDecimal postFee,
-                                                  @RequestBody ProductDTO product,
-                                                  @RequestBody AcceptAddressDTO address,
-                                                  @RequestBody BigDecimal price,
-                                                  @RequestBody CouponDTO coupon) {
-                String openId = JWTUtils.getOpenId(getToken());
-                Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
-                OrderDTO order = orderService.createOrder(customer, postFee, product, address, price, coupon);
-                return success(order);
-        }
+    /**
+     * 邮费，商品信息，收货地址对象 订单价格，
+     */
+    public ApiResponses<OrderDTO> createOrder(@RequestBody BigDecimal postFee,
+                                              @RequestBody ProductDTO product,
+                                              @RequestBody AcceptAddressDTO address,
+                                              @RequestBody BigDecimal price,
+                                              @RequestBody CouponDTO coupon) {
+        String openId = JWTUtils.getOpenId(getToken());
+        Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
+        OrderDTO order = orderService.createOrder(customer, postFee, product, address, price, coupon);
+        return success(order);
+    }
 
 }
