@@ -84,7 +84,7 @@ public class OrderRestController extends SuperController {
                                               @RequestBody ProductDTO product,
                                               @RequestBody AcceptAddressDTO address,
                                               @RequestBody BigDecimal price,
-                                              @RequestBody CouponDTO coupon) {
+                                              @RequestBody(required = false) CouponDTO coupon) {
         String openId = JWTUtils.getOpenId(getToken());
         Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
         OrderDTO order = orderService.createOrder(customer, postFee, product, address, price, coupon);
