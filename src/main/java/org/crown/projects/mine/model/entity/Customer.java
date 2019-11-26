@@ -59,7 +59,7 @@ public class Customer extends BaseModel {
     @ApiModelProperty(notes = "等级表id")
     private Integer mId;
     @ApiModelProperty(notes = "佣金余额")
-    private Double bonus;
+    private BigDecimal bonus;
     @ApiModelProperty(notes = "成交订单数")
     private Integer orderNum;
     @ApiModelProperty(notes = "成交总金额")
