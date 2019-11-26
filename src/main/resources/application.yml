@@ -70,5 +70,5 @@ qiniu:
   bucket: boostech
   prefix: q0lhgg606.bkt.clouddn.com
 wx:
-  appId: wxe1ea0d8fff2ca373
-  secret: 12a393199e9b57d33e6ece02a8964be0
+  appId: wxc70f297a49a01a6e
+  secret: d99213ebececcf8d9c0fbcd47461a627
