@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
  *
  * @author ykMa
  */
-@TableName("order")
+@TableName("`order`")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)

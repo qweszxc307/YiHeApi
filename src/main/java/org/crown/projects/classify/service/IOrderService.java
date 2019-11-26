@@ -22,11 +22,9 @@ package org.crown.projects.classify.service;
 
 import org.crown.framework.service.BaseService;
 import org.crown.projects.classify.model.dto.OrderDTO;
-import org.crown.projects.classify.model.dto.ProductDTO;
 import org.crown.projects.classify.model.entity.Order;
-import org.crown.projects.mine.model.dto.AcceptAddressDTO;
-import org.crown.projects.mine.model.dto.CouponDTO;
 import org.crown.projects.mine.model.entity.Customer;
+import org.crown.projects.mine.model.parm.OrderPARM;
 
 import java.math.BigDecimal;
 
@@ -56,9 +54,9 @@ public interface IOrderService extends BaseService<Order> {
      * @param product  商品信息
      * @param address  收货地址信息
      * @param price    总价格
-     * @param coupon  优惠券id
+     * @param coupon   优惠券id
      * @return 订单
      */
 
-    OrderDTO createOrder(Customer customer, BigDecimal postFee, ProductDTO product, AcceptAddressDTO address, BigDecimal price, CouponDTO coupon);
+    OrderDTO createOrder(Customer customer, OrderPARM orderPARM);
 }

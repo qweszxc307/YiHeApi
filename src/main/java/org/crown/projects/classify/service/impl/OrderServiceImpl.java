@@ -31,12 +31,14 @@ import org.crown.projects.classify.model.entity.PostFee;
 import org.crown.projects.classify.service.IOrderLogisticsService;
 import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
-import org.crown.projects.mine.model.dto.CouponDTO;
+import org.crown.projects.mine.model.entity.Coupon;
 import org.crown.projects.mine.model.entity.Customer;
+import org.crown.projects.mine.model.parm.OrderPARM;
 import org.crown.projects.mine.service.IAcceptAddressService;
 import org.crown.projects.mine.service.ICouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -57,6 +59,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     private IOrderLogisticsService orderLogisticsService;
     @Autowired
     private ICouponService couponService;
+
 
     @Override
     public BigDecimal queryPostFee(Integer num, Integer addId, Integer productId, BigDecimal prices) {
@@ -81,28 +84,25 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         return new BigDecimal("100");
     }
 
-    /**
-     * @param customer 客户信息
-     * @param postFee  邮费
-     * @param product  商品信息
-     * @param address  收货地址信息
-     * @param price    总价格
-     * @param coupon   优惠券id
-     * @return
-     */
+
+    @Transactional(readOnly = false)
     @Override
-    public OrderDTO createOrder(Customer customer,
-                                BigDecimal postFee,
-                                ProductDTO product,
-                                AcceptAddressDTO address,
-                                BigDecimal price,
-                                CouponDTO coupon) {
+    public OrderDTO createOrder(Customer customer, OrderPARM orderPARM) {
+        AcceptAddressDTO address = orderPARM.getAddress();
+        BigDecimal postFee = orderPARM.getPostFee();
+        BigDecimal price = orderPARM.getPrice();
+        Integer couponId = orderPARM.getCouponId();
+        ProductDTO product = orderPARM.getProduct();
         //创建订单
         Order order = new Order();
+        //购买数量
+        order.setNum(product.getNum());
         //生成订单号
         order.setOrderNum(CustomerUtils.getOrderNum());
         //设置应付价格
         order.setTotalFee(product.getPrice().multiply(new BigDecimal(product.getNum() + "")).add(postFee));
+        //商品的单价
+        order.setPrice(product.getPrice());
         //设置商品名称
         order.setTitle(product.getName());
         //设置订单状态
@@ -124,7 +124,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         //设置邮费
         order.setPostFee(postFee);
         //设置折扣价
-        if (Objects.nonNull(coupon)) {
+        if (Objects.nonNull(couponId)) {
+            Coupon coupon = couponService.getById(couponId);
             //使用了优惠券
             if (coupon.getType() == 3) {
                 order.setDiscountPrice(product.getPrice().multiply(new BigDecimal(product.getNum() + "")).multiply(coupon.getDiscountPoint()));

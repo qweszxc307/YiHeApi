@@ -20,13 +20,13 @@
  */
 package org.crown.projects.mine.model.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.crown.framework.model.BaseModel;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -38,7 +38,6 @@ import java.time.LocalDateTime;
  *
  * @author ykMa
  */
-@TableName("coupon")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -46,20 +45,28 @@ public class CouponDTO extends BaseModel {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(notes = "优惠券描述")
+    @NotNull
     private String details;
     @ApiModelProperty(notes = "优惠卷名称")
+    @NotNull
     private String name;
     @ApiModelProperty(notes = "类型{1：满减，2：直减，3折扣}")
+    @NotNull
     private Integer type;
     @ApiModelProperty(notes = "折扣条件")
+    @NotNull
     private BigDecimal discount;
     @ApiModelProperty(notes = "优惠价格")
+    @NotNull
     private BigDecimal discountPoint;
     @ApiModelProperty(notes = "开始时间")
+    @NotNull
     private LocalDateTime startTime;
     @ApiModelProperty(notes = "结束时间")
+    @NotNull
     private LocalDateTime endTime;
     @ApiModelProperty(notes = "品牌id")
+    @NotNull
     private Integer brandId;
 
 

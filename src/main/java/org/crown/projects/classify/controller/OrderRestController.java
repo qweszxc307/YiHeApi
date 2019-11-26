@@ -28,11 +28,9 @@ import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.dto.OrderDTO;
-import org.crown.projects.classify.model.dto.ProductDTO;
 import org.crown.projects.classify.service.IOrderService;
-import org.crown.projects.mine.model.dto.AcceptAddressDTO;
-import org.crown.projects.mine.model.dto.CouponDTO;
 import org.crown.projects.mine.model.entity.Customer;
+import org.crown.projects.mine.model.parm.OrderPARM;
 import org.crown.projects.mine.service.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -80,14 +78,12 @@ public class OrderRestController extends SuperController {
     /**
      * 邮费，商品信息，收货地址对象 订单价格，
      */
-    public ApiResponses<OrderDTO> createOrder(@RequestBody BigDecimal postFee,
-                                              @RequestBody ProductDTO product,
-                                              @RequestBody AcceptAddressDTO address,
-                                              @RequestBody BigDecimal price,
-                                              @RequestBody(required = false) CouponDTO coupon) {
+    public ApiResponses<OrderDTO> createOrder(@RequestBody OrderPARM orderPARM) {
+
         String openId = JWTUtils.getOpenId(getToken());
         Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
-        OrderDTO order = orderService.createOrder(customer, postFee, product, address, price, coupon);
+        OrderDTO order = orderService.createOrder(customer, orderPARM);
+
         return success(order);
     }
 
