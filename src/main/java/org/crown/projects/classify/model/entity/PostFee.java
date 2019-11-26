@@ -18,34 +18,40 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.service.impl;
+package org.crown.projects.classify.model.entity;
 
-import lombok.extern.log4j.Log4j2;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.mapper.CustomerMapper;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.service.ICustomerService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.crown.framework.model.BaseModel;
+
+import java.math.BigDecimal;
 
 
 /**
  * <p>
- * 服务实现类
+ * 运费策略价格表
  * </p>
  *
  * @author ykMa
  */
-@Log4j2
-@Service
-public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
-    /**
-     * 删除优惠券
-     *
-     * @param openId
-     */
-    @Transactional(readOnly = false)
-    public void deleteCoupon(String openId) {
+@TableName("carriage_config_price")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class PostFee extends BaseModel {
 
-    }
+    private static final long serialVersionUID = 1L;
+
+    @ApiModelProperty(notes = "起始区间数量")
+    private Integer sNum;
+    @ApiModelProperty(notes = "结束区间数量")
+    private Integer eNum;
+    @ApiModelProperty(notes = "价格")
+    private BigDecimal price;
+    @ApiModelProperty(notes = "运费配置表id")
+    private Integer configId;
+
 }

@@ -12,8 +12,15 @@ public class CustomerUtils {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date now = new Date();
         Random r = new Random();
-        int i1 = r.nextInt(99) + 100;
         return  (simpleDateFormat.format(now) + "").substring(2) + (now.getTime() + "").substring(4, 10) + (r.nextInt(899) + 100 + "");
 
     }
+    public static String getOrderNum() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Random r = new Random();
+        return ("YH"+simpleDateFormat.format(new Date()) + "").substring(2) + (new Date().getTime() + "").substring(4, 11) + (r.nextInt(8999) + 1000 + "");
+    }
+
+
+
 }

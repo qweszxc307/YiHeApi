@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.crown.projects.classify.mapper.OrderMapper">
+    <select id="queryCityIdByAreaName" parameterType="String" resultType="Integer">
+    select id from city where area_name = #{province};
+</select>
+    <select id="queryPostFee" resultType="PostFee">
+SELECT
+	ccp.id,ccp.e_num,ccp.s_num,ccp.price,ccp.config_id
+FROM
+	carriage_config_price ccp
+WHERE
+	ccp.config_id = (
+	SELECT
+		cac.config_id
+	FROM
+		carriage_area_city cac
+	WHERE
+		cac.city_id = 1
+	AND cac.carriage_id = ( SELECT pc.cid FROM product_carriage pc WHERE pc.pid = 13 )
+	)
+</select>
+
+
+</mapper>

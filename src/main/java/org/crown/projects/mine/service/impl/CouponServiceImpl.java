@@ -20,14 +20,14 @@
  */
 package org.crown.projects.mine.service.impl;
 
-import lombok.extern.log4j.Log4j2;
 import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.mapper.CustomerMapper;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.service.ICustomerService;
+import org.crown.projects.mine.mapper.CouponMapper;
+import org.crown.projects.mine.model.dto.CouponDTO;
+import org.crown.projects.mine.model.entity.Coupon;
+import org.crown.projects.mine.service.ICouponService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
 /**
  * <p>
@@ -36,16 +36,12 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author ykMa
  */
-@Log4j2
 @Service
-public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
-    /**
-     * 删除优惠券
-     *
-     * @param openId
-     */
-    @Transactional(readOnly = false)
-    public void deleteCoupon(String openId) {
+public class CouponServiceImpl extends BaseServiceImpl<CouponMapper, Coupon> implements ICouponService {
+    @Override
+    public List<CouponDTO> queryMyCoupon(String openId) {
+        return baseMapper.queryMyCoupon(openId);
 
     }
+
 }

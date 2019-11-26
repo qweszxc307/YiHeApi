@@ -27,49 +27,64 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.crown.enums.StatusEnum;
 import org.crown.framework.model.BaseModel;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
 /**
  * <p>
- * 收货地址表
+ *
  * </p>
  *
- * @author whZhang
+ * @author ykMa
  */
-@TableName("accept_address")
+@TableName("coupon")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class AcceptAddress extends BaseModel {
+public class Coupon extends BaseModel {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(notes = "用户id")
-    private Integer cId;
-    @ApiModelProperty(notes = "收货姓名")
+    @ApiModelProperty(notes = "id")
+    private Integer id;
+    @ApiModelProperty(notes = "优惠券描述")
+    private String details;
+    @ApiModelProperty(notes = "优惠卷名称")
     private String name;
-    @ApiModelProperty(notes = "手机号码")
-    private String phone;
-    @ApiModelProperty(notes = "省")
-    private String province;
-    @ApiModelProperty(notes = "市")
-    private String city;
-    @ApiModelProperty(notes = "县(区)")
-    private String district;
-    @ApiModelProperty(notes = "街道")
-    private String street;
-    @ApiModelProperty(notes = "openid")
-    private String openid;
-    @ApiModelProperty(notes = "状态：(1默认，0不默认)")
-    private StatusEnum status;
-    @ApiModelProperty(notes = "创建时间")
+    @ApiModelProperty(notes = "类型{1：满减，2：直减，3折扣}")
+    private Integer type;
+    @ApiModelProperty(notes = "折扣条件")
+    private BigDecimal discount;
+    @ApiModelProperty(notes = "优惠价格")
+    private BigDecimal discountPoint;
+    @ApiModelProperty(notes = "开始时间")
+    private LocalDateTime startTime;
+    @ApiModelProperty(notes = "结束时间")
+    private LocalDateTime endTime;
+    @ApiModelProperty(notes = "状态{1：禁用，0：启用}")
+    private Integer status;
+    @ApiModelProperty(notes = "发放数量")
+    private Integer total;
+    @ApiModelProperty(notes = "已发数量")
+    private Integer provide;
+    @ApiModelProperty(notes = "已用数量")
+    private Integer used;
+    @ApiModelProperty(notes = "分发规则{1：主动分发，2：下单分发，3：用户领取，4：中奖分发}")
+    private Integer rule;
+    @ApiModelProperty(notes = "品牌id")
+    private Integer brandId;
+    /*
+     * 创建时间
+     */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-    @ApiModelProperty(notes = "修改时间")
+    /**
+     * 修改时间
+     */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+
 }

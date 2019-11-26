@@ -18,34 +18,26 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.service.impl;
+package org.crown.projects.mine.service;
 
-import lombok.extern.log4j.Log4j2;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.mapper.CustomerMapper;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.service.ICustomerService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.crown.framework.service.BaseService;
+import org.crown.projects.mine.model.dto.CouponDTO;
+import org.crown.projects.mine.model.entity.Coupon;
 
+import java.util.List;
 
 /**
  * <p>
- * 服务实现类
+ *  服务类
  * </p>
  *
  * @author ykMa
  */
-@Log4j2
-@Service
-public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
+public interface ICouponService extends BaseService<Coupon> {
     /**
-     * 删除优惠券
-     *
+     * 我所有的优惠券
      * @param openId
+     * @return
      */
-    @Transactional(readOnly = false)
-    public void deleteCoupon(String openId) {
-
-    }
+    List<CouponDTO> queryMyCoupon(String openId);
 }

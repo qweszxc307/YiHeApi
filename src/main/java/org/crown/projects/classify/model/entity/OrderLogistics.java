@@ -18,48 +18,56 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.model.dto;
+package org.crown.projects.classify.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.crown.enums.StatusEnum;
-import org.crown.framework.model.convert.Convert;
+import org.crown.framework.model.BaseModel;
+
+import java.time.LocalDateTime;
 
 
 /**
  * <p>
- * 收货地址表
+ * 订单物流表
  * </p>
  *
- * @author whZhang
+ * @author ykMa
  */
-@TableName("accept_address")
+@TableName("order_logistics")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class AcceptAddressDTO extends Convert {
+public class OrderLogistics extends BaseModel {
 
-    private static final long serialVersionUID = 1L;
+private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(notes = "id")
-    private Integer id;
-    @ApiModelProperty(notes = "用户id")
-    private Integer cId;
-    @ApiModelProperty(notes = "收货姓名")
-    private String name;
-    @ApiModelProperty(notes = "手机号码")
-    private String phone;
+    @ApiModelProperty(notes = "订单id")
+private Integer orderId;
+    @ApiModelProperty(notes = "物流单号")
+private String logisticsNumber;
+    @ApiModelProperty(notes = "物流公司名称")
+private String logisticsCompany;
+    @ApiModelProperty(notes = "收件人")
+private String addressee;
+    @ApiModelProperty(notes = "收件人手机号码")
+private String phone;
     @ApiModelProperty(notes = "省")
-    private String province;
+private String province;
     @ApiModelProperty(notes = "市")
-    private String city;
-    @ApiModelProperty(notes = "县(区)")
-    private String district;
+private String city;
+    @ApiModelProperty(notes = "区")
+private String district;
     @ApiModelProperty(notes = "街道")
-    private String street;
-    @ApiModelProperty(notes = "状态：(1默认，0不默认)")
-    private StatusEnum status;
+private String street;
+    @ApiModelProperty(notes = "邮编")
+private Integer postcode;
+    @ApiModelProperty(notes = "创建时间")
+private LocalDateTime createTime;
+    @ApiModelProperty(notes = "更新时间")
+private LocalDateTime updateTime;
+
 }

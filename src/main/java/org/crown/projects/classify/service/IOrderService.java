@@ -18,34 +18,47 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.service.impl;
+package org.crown.projects.classify.service;
 
-import lombok.extern.log4j.Log4j2;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.mapper.CustomerMapper;
+import org.crown.framework.service.BaseService;
+import org.crown.projects.classify.model.dto.OrderDTO;
+import org.crown.projects.classify.model.dto.ProductDTO;
+import org.crown.projects.classify.model.entity.Order;
+import org.crown.projects.mine.model.dto.AcceptAddressDTO;
+import org.crown.projects.mine.model.dto.CouponDTO;
 import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.service.ICustomerService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 
 /**
  * <p>
- * 服务实现类
+ * 订单主表 服务类
  * </p>
  *
  * @author ykMa
  */
-@Log4j2
-@Service
-public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
+public interface IOrderService extends BaseService<Order> {
     /**
-     * 删除优惠券
-     *
-     * @param openId
+     * 查邮费
+     * @param num  购买的商品数量
+     * @param addId    收货地址id
+     * @param productId   产品id
+     * @param prices    商品的总价格
+     * @return 邮费
      */
-    @Transactional(readOnly = false)
-    public void deleteCoupon(String openId) {
+    BigDecimal queryPostFee(Integer num, Integer addId, Integer productId, BigDecimal prices);
 
-    }
+    /**
+     * 下单
+     *
+     * @param customer 客户信息
+     * @param postFee  邮费
+     * @param product  商品信息
+     * @param address  收货地址信息
+     * @param price    总价格
+     * @param coupon  优惠券id
+     * @return 订单
+     */
+
+    OrderDTO createOrder(Customer customer, BigDecimal postFee, ProductDTO product, AcceptAddressDTO address, BigDecimal price, CouponDTO coupon);
 }

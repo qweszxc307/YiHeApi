@@ -18,58 +18,58 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.model.entity;
+package org.crown.projects.classify.model.dto;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.crown.enums.StatusEnum;
 import org.crown.framework.model.BaseModel;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
 /**
  * <p>
- * 收货地址表
+ * 订单
  * </p>
  *
- * @author whZhang
+ * @author ykMa
  */
-@TableName("accept_address")
+@ApiModel
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class AcceptAddress extends BaseModel {
+public class OrderDTO extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(notes = "用户id")
-    private Integer cId;
-    @ApiModelProperty(notes = "收货姓名")
-    private String name;
-    @ApiModelProperty(notes = "手机号码")
-    private String phone;
-    @ApiModelProperty(notes = "省")
-    private String province;
-    @ApiModelProperty(notes = "市")
-    private String city;
-    @ApiModelProperty(notes = "县(区)")
-    private String district;
-    @ApiModelProperty(notes = "街道")
-    private String street;
-    @ApiModelProperty(notes = "openid")
-    private String openid;
-    @ApiModelProperty(notes = "状态：(1默认，0不默认)")
-    private StatusEnum status;
-    @ApiModelProperty(notes = "创建时间")
-    @TableField(fill = FieldFill.INSERT)
+    @ApiModelProperty(notes = "订单号")
+    private String orderNum;
+    @ApiModelProperty(notes = "订单类型：0普通订单，1分享返礼订单")
+    private Integer orderType;
+    @ApiModelProperty(notes = "总金额")
+    private BigDecimal totalFee;
+    @ApiModelProperty(notes = "实付金额")
+    private BigDecimal actualFee;
+    @ApiModelProperty(notes = "邮费")
+    private BigDecimal postFee;
+    @ApiModelProperty(notes = "商品id")
+    private Integer productId;
+    @ApiModelProperty(notes = "购买数量")
+    private Integer num;
+    @ApiModelProperty(notes = "商品标题")
+    private String title;
+    @ApiModelProperty(notes = "商品单价")
+    private BigDecimal price;
+    @ApiModelProperty(notes = "折扣后的价格")
+    private BigDecimal discountPrice;
+    @ApiModelProperty(notes = "商品图片")
+    private String image;
+    @ApiModelProperty(notes = "订单状态：（ 1：未付款， 2：已付款，未发货， 3：已发货，未收货 4：已收货，未确认 5：确认收货，未评价 6：已评价）")
+    private Boolean status;
+    @ApiModelProperty(notes = "下单时间")
     private LocalDateTime createTime;
-    @ApiModelProperty(notes = "修改时间")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
 }

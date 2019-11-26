@@ -30,4 +30,6 @@ public class ProductDTO extends Convert {
     private String imgUrl;
     @ApiModelProperty(notes = "最低价格")
     private BigDecimal price;
+    @ApiModelProperty(notes = "商品购买数量，下单时候用")
+    private Integer num;
 }

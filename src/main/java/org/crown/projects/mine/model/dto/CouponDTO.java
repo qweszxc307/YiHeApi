@@ -18,34 +18,49 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.mine.service.impl;
+package org.crown.projects.mine.model.dto;
 
-import lombok.extern.log4j.Log4j2;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.mine.mapper.CustomerMapper;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.service.ICustomerService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.crown.framework.model.BaseModel;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 /**
  * <p>
- * 服务实现类
+ *
  * </p>
  *
  * @author ykMa
  */
-@Log4j2
-@Service
-public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
-    /**
-     * 删除优惠券
-     *
-     * @param openId
-     */
-    @Transactional(readOnly = false)
-    public void deleteCoupon(String openId) {
+@TableName("coupon")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class CouponDTO extends BaseModel {
+    private static final long serialVersionUID = 1L;
 
-    }
+    @ApiModelProperty(notes = "优惠券描述")
+    private String details;
+    @ApiModelProperty(notes = "优惠卷名称")
+    private String name;
+    @ApiModelProperty(notes = "类型{1：满减，2：直减，3折扣}")
+    private Integer type;
+    @ApiModelProperty(notes = "折扣条件")
+    private BigDecimal discount;
+    @ApiModelProperty(notes = "优惠价格")
+    private BigDecimal discountPoint;
+    @ApiModelProperty(notes = "开始时间")
+    private LocalDateTime startTime;
+    @ApiModelProperty(notes = "结束时间")
+    private LocalDateTime endTime;
+    @ApiModelProperty(notes = "品牌id")
+    private Integer brandId;
+
+
 }
