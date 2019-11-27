@@ -27,8 +27,11 @@ import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
+import org.crown.projects.classify.service.IBrandService;
 import org.crown.projects.mine.model.dto.CouponDTO;
 import org.crown.projects.mine.model.entity.Coupon;
+import org.crown.projects.mine.model.entity.CouponBrand;
+import org.crown.projects.mine.service.ICouponBrandService;
 import org.crown.projects.mine.service.ICouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,6 +40,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,15 +59,40 @@ public class CouponRestController extends SuperController {
     @Autowired
     private ICouponService couponService;
 
+    @Autowired
+    private ICouponBrandService couponBrandService;
+    @Autowired
+    private IBrandService brandService;
+
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation("查询一元三张优惠券")
     @GetMapping(value = "/coupons")
     public ApiResponses<List<CouponDTO>> get() {
-        return success(couponService.query()
+
+        List<CouponDTO> entitys = couponService.query()
                 .eq(Coupon::getStatus, 0)
                 .eq(Coupon::getRule, 5)
-                .entitys(e -> e.convert(CouponDTO.class)));
+                .entitys(e -> {
+                    List<Integer> brandIds = new ArrayList<>();
+                    List<String> brandNames = new ArrayList<>();
+                    couponBrandService.query().eq(CouponBrand::getCouponId, e.getId()).entitys(a -> {
+                        brandIds.add(a.getBrandId());
+                        brandNames.add(brandService.getById(a.getBrandId()).getName());
+                        return a;
+                    });
+                    CouponDTO convert = e.convert(CouponDTO.class);
+                    if (brandIds.size() == brandService.query().count()) {
+                        ArrayList<String> strings = new ArrayList<>();
+                        strings.add("全部");
+                        convert.setBrandName(strings);
+                    } else {
+                        convert.setBrandName(brandNames);
+                    }
+                    convert.setBrandId(brandIds);
+                    return convert;
+                });
+        return success(entitys);
     }
 
     @Resources(auth = AuthTypeEnum.AUTH)
@@ -71,7 +100,25 @@ public class CouponRestController extends SuperController {
     @GetMapping(value = "/coupon")
     public ApiResponses<List<CouponDTO>> getCoupon() {
         String openId = JWTUtils.getOpenId(getToken());
-        return success(couponService.queryMyCoupon(openId));
+        List<CouponDTO> couponDTOS = couponService.queryMyCoupon(openId);
+        couponDTOS.forEach(e->{
+            List<Integer> brandIds = new ArrayList<>();
+            List<String> brandNames = new ArrayList<>();
+            couponBrandService.query().eq(CouponBrand::getCouponId, e.getId()).entitys(a -> {
+                brandIds.add(a.getBrandId());
+                brandNames.add(brandService.getById(a.getBrandId()).getName());
+                return a;
+            });
+            if (brandIds.size() == brandService.query().count()) {
+                ArrayList<String> strings = new ArrayList<>();
+                strings.add("全部");
+                e.setBrandName(strings);
+            } else {
+                e.setBrandName(brandNames);
+            }
+            e.setBrandId(brandIds);
+        });
+        return success(couponDTOS);
     }
 
 }

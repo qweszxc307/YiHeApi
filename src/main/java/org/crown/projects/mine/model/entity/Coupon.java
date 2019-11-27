@@ -73,8 +73,6 @@ public class Coupon extends BaseModel {
     private Integer used;
     @ApiModelProperty(notes = "分发规则{1：主动分发，2：下单分发，3：用户领取，4：中奖分发}")
     private Integer rule;
-    @ApiModelProperty(notes = "品牌id")
-    private Integer brandId;
     /*
      * 创建时间
      */
