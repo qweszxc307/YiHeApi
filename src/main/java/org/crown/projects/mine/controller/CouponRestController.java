@@ -21,8 +21,6 @@
 package org.crown.projects.mine.controller;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
 import org.crown.common.utils.JWTUtils;
@@ -30,14 +28,14 @@ import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.mine.model.dto.CouponDTO;
-import org.crown.projects.mine.model.entity.City;
 import org.crown.projects.mine.model.entity.Coupon;
 import org.crown.projects.mine.service.ICouponService;
-import org.crown.projects.mine.service.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -56,15 +54,15 @@ public class CouponRestController extends SuperController {
 
     @Autowired
     private ICouponService couponService;
-    @Autowired
-    private ICustomerService customerService;
+
 
     @Resources(auth = AuthTypeEnum.AUTH)
-    @ApiOperation("查询所有优惠券")
+    @ApiOperation("查询一元三张优惠券")
     @GetMapping(value = "/coupons")
     public ApiResponses<List<CouponDTO>> get() {
         return success(couponService.query()
                 .eq(Coupon::getStatus, 0)
+                .eq(Coupon::getRule, 5)
                 .entitys(e -> e.convert(CouponDTO.class)));
     }
 
