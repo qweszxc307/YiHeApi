@@ -95,13 +95,27 @@ public class OrderRestController extends SuperController {
     @ApiOperation("查询我的订单")
     @GetMapping(value = "/order")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "status", value = "产品ID", required = false, paramType = "path")
+            @ApiImplicitParam(name = "status", value = "产品ID", required = true, paramType = "path")
     })
-    public ApiResponses<List<OrderDTO>> getOrder(@RequestParam(required = false) Integer status) {
+    public ApiResponses<List<OrderDTO>> getOrder(@RequestParam(required = true) Integer status) {
         String openId = JWTUtils.getOpenId(getToken());
         Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
         return success(orderService.query().eq(status != 0, Order::getStatus, status).eq(Order::getCustomerId, customer.getId()).entitys(e -> e.convert(OrderDTO.class)));
     }
 
+
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("取消订单")
+    @DeleteMapping(value = "/order/{id}")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "订单id", required = true, paramType = "path")
+    })
+    public ApiResponses<Void> deleteOrder(@PathVariable("id") Integer id) {
+
+
+        orderService.deleteOrder(id, JWTUtils.getOpenId(getToken()));
+        return success();
+    }
 
 }

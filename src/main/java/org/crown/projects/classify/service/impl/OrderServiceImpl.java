@@ -32,9 +32,11 @@ import org.crown.projects.classify.service.IOrderLogisticsService;
 import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
 import org.crown.projects.mine.model.entity.Coupon;
+import org.crown.projects.mine.model.entity.CouponCustomer;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.model.parm.OrderPARM;
 import org.crown.projects.mine.service.IAcceptAddressService;
+import org.crown.projects.mine.service.ICouponCustomerService;
 import org.crown.projects.mine.service.ICouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +61,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     private IOrderLogisticsService orderLogisticsService;
     @Autowired
     private ICouponService couponService;
+    @Autowired
+    private ICouponCustomerService couponCustomerService;
 
 
     @Override
@@ -126,6 +130,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         //设置折扣价
         if (Objects.nonNull(couponId)) {
             Coupon coupon = couponService.getById(couponId);
+            //设置订单优惠券
+            order.setCouponId(couponId);
             //使用了优惠券
             if (coupon.getType() == 3) {
                 order.setDiscountPrice(product.getPrice().multiply(new BigDecimal(product.getNum() + "")).multiply(coupon.getDiscountPoint()));
@@ -134,7 +140,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             }
             //优惠券数量减少
             couponService.deleteCouponCustomerById(coupon.getId());
-
         }
         //保存订单
         save(order);
@@ -154,4 +159,24 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         return order.convert(OrderDTO.class);
     }
 
+    /**
+     * 取消订单
+     *
+     * @param orderId 订单id
+     * @param openId  客户信息
+     */
+    @Transactional(readOnly = false)
+    @Override
+    public void deleteOrder(Integer orderId, String openId) {
+        Order order = getById(orderId);
+        if (Objects.nonNull(order.getCouponId())) {
+            CouponCustomer couponCustomer = new CouponCustomer();
+            couponCustomer.setCouponId(order.getCouponId());
+            couponCustomer.setOpenId(openId);
+            couponCustomerService.save(couponCustomer);
+        }
+        removeById(orderId);
+    }
 }
+
+

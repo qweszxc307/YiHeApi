@@ -18,54 +18,18 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.classify.service;
+package org.crown.projects.mine.service;
 
 import org.crown.framework.service.BaseService;
-import org.crown.projects.classify.model.dto.OrderDTO;
-import org.crown.projects.classify.model.entity.Order;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.model.parm.OrderPARM;
-
-import java.math.BigDecimal;
+import org.crown.projects.mine.model.entity.CouponCustomer;
 
 /**
  * <p>
- * 订单主表 服务类
+ *  服务类
  * </p>
  *
  * @author ykMa
  */
-public interface IOrderService extends BaseService<Order> {
-    /**
-     * 查邮费
-     * @param num  购买的商品数量
-     * @param addId    收货地址id
-     * @param productId   产品id
-     * @param prices    商品的总价格
-     * @return 邮费
-     */
-    BigDecimal queryPostFee(Integer num, Integer addId, Integer productId, BigDecimal prices);
+public interface ICouponCustomerService extends BaseService<CouponCustomer> {
 
-    /**
-     * 下单
-     *
-     * @param customer 客户信息
-     * @param postFee  邮费
-     * @param product  商品信息
-     * @param address  收货地址信息
-     * @param price    总价格
-     * @param coupon   优惠券id
-     * @return 订单
-     */
-
-    OrderDTO createOrder(Customer customer, OrderPARM orderPARM);
-    /**
-     * 取消订单
-     * @param orderId 订单id
-     * @param openId  客户信息
-     */
-
-    void deleteOrder(Integer orderId, String openId);
-
-
-}
+        }

@@ -56,8 +56,8 @@ public class Order extends BaseModel {
     private BigDecimal totalFee;
     @ApiModelProperty(notes = "实付金额")
     private BigDecimal actualFee;
-    @ApiModelProperty(notes = "活动id")
-    private String promotionIds;
+    @ApiModelProperty(notes = "优惠券id")
+    private Integer couponId;
     @ApiModelProperty(notes = "支付类型：1在线支付，2货到付款")
     private Integer paymentType;
     @ApiModelProperty(notes = "邮费")
