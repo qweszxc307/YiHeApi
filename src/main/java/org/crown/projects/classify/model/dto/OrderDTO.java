@@ -69,7 +69,7 @@ public class OrderDTO extends BaseModel {
     @ApiModelProperty(notes = "商品图片")
     private String image;
     @ApiModelProperty(notes = "订单状态：（ 1：未付款， 2：已付款，未发货， 3：已发货，未收货 4：已收货，未确认 5：确认收货，未评价 6：已评价）")
-    private Boolean status;
+    private Integer status;
     @ApiModelProperty(notes = "下单时间")
     private LocalDateTime createTime;
 }

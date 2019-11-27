@@ -21,6 +21,8 @@
 package org.crown.projects.classify.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
 import org.crown.common.utils.JWTUtils;
@@ -28,6 +30,7 @@ import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.dto.OrderDTO;
+import org.crown.projects.classify.model.entity.Order;
 import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.model.parm.OrderPARM;
@@ -38,6 +41,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -86,5 +90,18 @@ public class OrderRestController extends SuperController {
 
         return success(order);
     }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("查询我的订单")
+    @GetMapping(value = "/order")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "status", value = "产品ID", required = false, paramType = "path")
+    })
+    public ApiResponses<List<OrderDTO>> getOrder(@RequestParam(required = false) Integer status) {
+        String openId = JWTUtils.getOpenId(getToken());
+        Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
+        return success(orderService.query().eq(status != 0, Order::getStatus, status).eq(Order::getCustomerId, customer.getId()).entitys(e -> e.convert(OrderDTO.class)));
+    }
+
 
 }
