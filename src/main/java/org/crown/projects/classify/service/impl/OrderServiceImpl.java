@@ -64,7 +64,14 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     @Autowired
     private ICouponCustomerService couponCustomerService;
 
-
+    /**
+     *
+     * @param num  购买的商品数量
+     * @param addId    收货地址id
+     * @param productId   产品id
+     * @param prices    商品的总价格
+     * @return 邮费
+     */
     @Override
     public BigDecimal queryPostFee(Integer num, Integer addId, Integer productId, BigDecimal prices) {
         //查询地址id的省份
@@ -88,6 +95,12 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         return new BigDecimal("100");
     }
 
+    /**
+     *
+     * @param customer 客户信息
+     * @param orderPARM 订单信息
+     * @return 订单
+     */
 
     @Transactional(readOnly = false)
     @Override
@@ -101,6 +114,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         Order order = new Order();
         //购买数量
         order.setNum(product.getNum());
+        //设置订单类型
+        order.setOrderType(orderPARM.getOrderType());
         //生成订单号
         order.setOrderNum(CustomerUtils.getOrderNum());
         //设置应付价格

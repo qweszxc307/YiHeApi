@@ -48,13 +48,8 @@ public interface IOrderService extends BaseService<Order> {
 
     /**
      * 下单
-     *
      * @param customer 客户信息
-     * @param postFee  邮费
-     * @param product  商品信息
-     * @param address  收货地址信息
-     * @param price    总价格
-     * @param coupon   优惠券id
+     * @param orderPARM 订单信息
      * @return 订单
      */
 

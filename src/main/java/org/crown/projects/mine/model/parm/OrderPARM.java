@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = false)
 public class OrderPARM  extends Convert {
     private static final long serialVersionUID = 1L;
-
+    private Integer orderType;
     private BigDecimal postFee;
     private ProductDTO product;
     private AcceptAddressDTO address;
