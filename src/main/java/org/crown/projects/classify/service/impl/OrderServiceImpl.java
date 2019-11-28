@@ -31,7 +31,6 @@ import org.crown.projects.classify.model.entity.PostFee;
 import org.crown.projects.classify.service.IOrderLogisticsService;
 import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
-import org.crown.projects.mine.model.entity.Coupon;
 import org.crown.projects.mine.model.entity.CouponCustomer;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.model.parm.OrderPARM;
@@ -43,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -104,7 +104,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         //生成订单号
         order.setOrderNum(CustomerUtils.getOrderNum());
         //设置应付价格
-        order.setTotalFee(product.getPrice().multiply(new BigDecimal(product.getNum() + "")).add(postFee));
+        order.setTotalFee(price);
         //商品的单价
         order.setPrice(product.getPrice());
         //设置商品名称
@@ -115,12 +115,10 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         order.setProductId(product.getId());
         //设置用户id
         order.setCustomerId(customer.getId());
+        //设置下单时间
+        order.setCreateTime(LocalDateTime.now());
         //设置订单号
         order.setOrderNum(CustomerUtils.getOrderNum());
-        //设置实际支付金额
-        order.setActualFee(price);
-        //设置优惠价
-        order.setDiscountPrice(price);
         //订单图片
         order.setImage(product.getImgUrl());
         //设置支付类型
@@ -129,17 +127,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         order.setPostFee(postFee);
         //设置折扣价
         if (Objects.nonNull(couponId)) {
-            Coupon coupon = couponService.getById(couponId);
             //设置订单优惠券
             order.setCouponId(couponId);
-            //使用了优惠券
-            if (coupon.getType() == 3) {
-                order.setDiscountPrice(product.getPrice().multiply(new BigDecimal(product.getNum() + "")).multiply(coupon.getDiscountPoint()));
-            } else {
-                order.setDiscountPrice((product.getPrice().multiply(new BigDecimal(product.getNum() + ""))).subtract(coupon.getDiscountPoint()));
+            List<CouponCustomer> list = couponCustomerService.query().eq(CouponCustomer::getCouponId, couponId).eq(CouponCustomer::getOpenId, customer.getOpenId()).list();
+            for (int i = 0; i < 1; i++) {
+                //优惠券数量减少
+                couponService.deleteCouponCustomerById(list.get(i).getId());
             }
-            //优惠券数量减少
-            couponService.deleteCouponCustomerById(coupon.getId());
         }
         //保存订单
         save(order);
@@ -175,6 +169,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             couponCustomer.setOpenId(openId);
             couponCustomerService.save(couponCustomer);
         }
+        OrderLogistics entity = orderLogisticsService.query().eq(OrderLogistics::getOrderId, orderId).entity(e -> e);
+        orderLogisticsService.removeById(entity);
         removeById(orderId);
     }
 }

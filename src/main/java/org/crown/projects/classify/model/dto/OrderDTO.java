@@ -52,8 +52,6 @@ public class OrderDTO extends BaseModel {
     private Integer orderType;
     @ApiModelProperty(notes = "总金额")
     private BigDecimal totalFee;
-    @ApiModelProperty(notes = "实付金额")
-    private BigDecimal actualFee;
     @ApiModelProperty(notes = "邮费")
     private BigDecimal postFee;
     @ApiModelProperty(notes = "商品id")

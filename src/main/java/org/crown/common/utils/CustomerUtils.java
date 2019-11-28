@@ -18,7 +18,7 @@ public class CustomerUtils {
     public static String getOrderNum() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Random r = new Random();
-        return ("YH"+simpleDateFormat.format(new Date()) + "").substring(2) + (new Date().getTime() + "").substring(4, 11) + (r.nextInt(8999) + 1000 + "");
+        return "YH"+(simpleDateFormat.format(new Date()) + "").substring(2) + (new Date().getTime() + "").substring(4, 11) + (r.nextInt(8999) + 1000 + "");
     }
 
 

@@ -72,8 +72,6 @@ public class Order extends BaseModel {
     private String title;
     @ApiModelProperty(notes = "价格,单位：分")
     private BigDecimal price;
-    @ApiModelProperty(notes = "折扣价")
-    private BigDecimal discountPrice;
     @ApiModelProperty(notes = "商品图片")
     private String image;
     @ApiModelProperty(notes = "发票类型：（0无发票，1普通发票，2电子发票，3增值税发票）")
