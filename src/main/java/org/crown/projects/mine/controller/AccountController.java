@@ -9,6 +9,7 @@ import org.crown.common.annotations.Resources;
 import org.crown.common.utils.CustomerUtils;
 import org.crown.common.utils.HttpUtils;
 import org.crown.common.utils.JWTUtils;
+import org.crown.common.utils.QiNiuUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
@@ -26,9 +27,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @version V1.0
@@ -53,6 +58,9 @@ public class AccountController extends SuperController {
     IAcceptAddressService acceptAddressService;
     @Autowired
     private ILabelService labelService;
+
+    @Autowired
+    private QiNiuUtils qiNiuUtils;
 
     @Resources(auth = AuthTypeEnum.OPEN)
     @ApiOperation("微信获取token")
@@ -132,10 +140,7 @@ public class AccountController extends SuperController {
     @PutMapping(value = "/user/detail")
     public ApiResponses<Void> detail(@RequestBody @Validated(CustomerPARM.Update.class) CustomerPARM customerPARM) {
         String openId = JWTUtils.getOpenId(getToken());
-        Integer id = customerService.query().eq(Customer::getOpenId,openId).getOne().getId();
-        Customer customer = customerPARM.convert(Customer.class);
-        customer.setId(id);
-        customerService.updateById(customer);
+        customerService.updateCustomerInfoByOpenId(openId,customerPARM);
         return success();
     }
 
@@ -225,5 +230,27 @@ public class AccountController extends SuperController {
         return success();
     }
 
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("修改用户头像")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", value = "图片", required = true, paramType = "body")
+    })
+    @PostMapping(value = "/user/head")
+    public ApiResponses<Void> updateHeadImg(@RequestBody MultipartFile file){
+        String openId = JWTUtils.getOpenId(getToken());
+        Customer customer = customerService.query().eq(Customer::getOpenId,openId).entity(e->e);
+        String originalFilename = file.getOriginalFilename();
+        String fileExtend = originalFilename.substring(originalFilename.lastIndexOf("."));
+        //默认不指定key的情况下，以文件内容的hash值作为文件名
+        String fileKey = UUID.randomUUID().toString().replace("-", "") + fileExtend;
+        try {
+            String imgUrl = qiNiuUtils.upload(file.getInputStream(),fileKey);
+            customer.setHeadImg(imgUrl);
+            customerService.updateById(customer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return success();
+    }
 
 }

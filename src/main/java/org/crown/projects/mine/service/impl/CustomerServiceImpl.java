@@ -24,8 +24,11 @@ import lombok.extern.log4j.Log4j2;
 import org.crown.framework.service.impl.BaseServiceImpl;
 import org.crown.projects.mine.mapper.CustomerMapper;
 import org.crown.projects.mine.model.entity.Customer;
+import org.crown.projects.mine.model.parm.CustomerPARM;
 import org.crown.projects.mine.service.ICustomerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -39,5 +42,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
 
+    @Autowired
+    ICustomerService customerService;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCustomerInfoByOpenId(String openId, CustomerPARM customerPARM) {
+        Integer id = customerService.query().eq(Customer::getOpenId,openId).getOne().getId();
+        Customer customer = customerPARM.convert(Customer.class);
+        customer.setId(id);
+        customerService.updateById(customer);
+    }
 }
 

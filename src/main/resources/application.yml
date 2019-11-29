@@ -67,8 +67,8 @@ spring:
 qiniu:
   accessKey: 4Xgx3ORBO0oMGaOTe4qNZLE3R9yK_X1irnadwNEL
   secretKey: SGEQW42gGP09ecTgWEa65n1_H81XsXQ-EadDRh6z
-  bucket: boostech
-  prefix: q0lhgg606.bkt.clouddn.com
+  bucket: yihe-wechat
+  prefix: q1pxvpm3i.bkt.clouddn.com
 wx:
   appId: wxc70f297a49a01a6e
   secret: d99213ebececcf8d9c0fbcd47461a627

@@ -23,6 +23,7 @@ package org.crown.projects.mine.service;
 
 import org.crown.framework.service.BaseService;
 import org.crown.projects.mine.model.entity.Customer;
+import org.crown.projects.mine.model.parm.CustomerPARM;
 
 /**
  * <p>
@@ -32,5 +33,7 @@ import org.crown.projects.mine.model.entity.Customer;
  * @author whZhang
  */
 public interface ICustomerService extends BaseService<Customer> {
+
+    void updateCustomerInfoByOpenId(String openId,CustomerPARM customerPARM);
 
 }

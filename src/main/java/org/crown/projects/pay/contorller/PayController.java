@@ -4,7 +4,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.crown.common.annotations.Resources;
 import org.crown.common.utils.JWTUtils;
+import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.projects.pay.utlis.PayUtil;
 import org.springframework.http.MediaType;
@@ -26,6 +28,7 @@ import java.util.Random;
 @Validated
 public class PayController extends SuperController {
 
+    @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "请求支付接口")
     @PostMapping(value = "/wxPay/{id}")
     public JSONObject wxPay(@PathVariable("id") Integer orderId) {
@@ -40,11 +43,11 @@ public class PayController extends SuperController {
             //组装参数，用户生成统一下单接口的签名
             Map<String, String> packageParams = new HashMap<>();
             packageParams.put("appid", appId);
-            packageParams.put("mch_id", mch_id);
+            packageParams.put("mch_id", mchId);
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", orderId + "");//商户订单号,自己的订单ID
-            packageParams.put("total_fee", 100 + "");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", 1 + "");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", notify_url);//支付成功后的回调地址
             packageParams.put("trade_type", TRADETYPE);//支付方式
@@ -58,7 +61,7 @@ public class PayController extends SuperController {
             //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
             String xml = "<xml>" + "<appid>" +appId + "</appid>"
                     + "<body><![CDATA[" + body + "]]></body>"
-                    + "<mch_id>" + mch_id + "</mch_id>"
+                    + "<mch_id>" + mchId + "</mch_id>"
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
                     + "<notify_url>" + notify_url + "</notify_url>"
                     + "<openid>" + JWTUtils.getOpenId(getToken()) + "</openid>"
@@ -103,7 +106,7 @@ public class PayController extends SuperController {
     }
 
     //这里是支付回调接口，微信支付成功后会自动调用
-    @RequestMapping(value = "/wxNotify", method = RequestMethod.POST)
+    @PostMapping(value = "/wxNotify")
     public void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
         String line = null;

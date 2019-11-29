@@ -46,12 +46,12 @@ public class SuperController {
     public String secret;
     //微信支付的商户id
     @Value("${wx.mchId}")
-    public static final String mch_id = "";
+    public  String mchId ;
     //微信支付的商户密钥
     @Value("${wx.key}")
-    public static final String key = "";
+    public String key ;
     //支付成功后的服务器回调url，这里填PayController里的回调函数地址
-    public static final String notify_url = "";
+    public static final String notify_url = "http://iozwh.55555.io/wxServices/wxNotify";
     //签名方式，固定值
     public static final String SIGNTYPE = "MD5";
     //交易类型，小程序支付的固定值为JSAPI

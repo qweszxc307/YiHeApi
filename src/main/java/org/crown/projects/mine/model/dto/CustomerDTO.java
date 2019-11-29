@@ -63,6 +63,8 @@ public class CustomerDTO extends BaseModel {
     private String phone;
     @ApiModelProperty(notes = "注册地址")
     private String address;
+    @ApiModelProperty(notes = "佣金余额")
+    private BigDecimal bonus;
     @ApiModelProperty(notes = "喜欢品牌")
     private List<LabelBrandDTO> labelBrandList;
 
