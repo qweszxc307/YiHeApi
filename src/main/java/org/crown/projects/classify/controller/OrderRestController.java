@@ -36,11 +36,14 @@ import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.model.parm.OrderPARM;
 import org.crown.projects.mine.service.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -87,7 +90,6 @@ public class OrderRestController extends SuperController {
         String openId = JWTUtils.getOpenId(getToken());
         Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
         OrderDTO order = orderService.createOrder(customer, orderPARM);
-
         return success(order);
     }
 
@@ -98,9 +100,29 @@ public class OrderRestController extends SuperController {
             @ApiImplicitParam(name = "status", value = "产品ID", required = true, paramType = "path")
     })
     public ApiResponses<List<OrderDTO>> getOrder(@RequestParam(required = true) Integer status) {
-        String openId = JWTUtils.getOpenId(getToken());
-        Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
-        return success(orderService.query().eq(status != 0, Order::getStatus, status).eq(Order::getCustomerId, customer.getId()).entitys(e -> e.convert(OrderDTO.class)));
+        try {
+            String openId = JWTUtils.getOpenId(getToken());
+            Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
+            List<OrderDTO> orders = new ArrayList<>();
+            List<OrderDTO> entitys = orderService.query()
+                    .eq(status != 0, Order::getStatus, status)
+                    .eq(Order::getCustomerId, customer.getId())
+                    .gt(status == 1, Order::getCloseTime, LocalDateTime.now())
+                    .orderByDesc(Order::getCreateTime)
+                    .entitys(e -> e.convert(OrderDTO.class));
+            if (entitys.size() > 0) {
+                entitys.forEach(e->{
+                    if (e.getStatus() == 1 && e.getCloseTime().isAfter(LocalDateTime.now())) {
+                        orders.add(e);
+                    } else {
+                        orders.add(e);
+                    }
+                });
+            }
+            return success(orders);
+        } catch (Exception e) {
+            return success(HttpStatus.REQUEST_TIMEOUT, null);
+        }
     }
 
 

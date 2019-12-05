@@ -70,4 +70,6 @@ public class OrderDTO extends BaseModel {
     private Integer status;
     @ApiModelProperty(notes = "下单时间")
     private LocalDateTime createTime;
+    @ApiModelProperty(notes = "交易关闭时间")
+    private LocalDateTime closeTime;
 }

@@ -20,6 +20,7 @@
  */
 package org.crown.projects.classify.service.impl;
 
+import org.crown.common.enums.OrderEnum;
 import org.crown.common.utils.CustomerUtils;
 import org.crown.framework.service.impl.BaseServiceImpl;
 import org.crown.projects.classify.mapper.OrderMapper;
@@ -136,6 +137,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         order.setImage(product.getImgUrl());
         //设置支付类型
         order.setPaymentType(1);
+        //设置交易关闭时间
+        order.setCloseTime(LocalDateTime.now().plusMinutes(OrderEnum.CLOSE_TIME.value()));
         //设置邮费
         order.setPostFee(postFee);
         //设置折扣价
