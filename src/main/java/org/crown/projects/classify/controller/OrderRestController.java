@@ -97,7 +97,7 @@ public class OrderRestController extends SuperController {
     @ApiOperation("查询我的订单")
     @GetMapping(value = "/order")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "status", value = "产品ID", required = true, paramType = "path")
+            @ApiImplicitParam(name = "status", value = "订单状态", required = true, paramType = "path")
     })
     public ApiResponses<List<OrderDTO>> getOrder(@RequestParam(required = true) Integer status) {
         try {
