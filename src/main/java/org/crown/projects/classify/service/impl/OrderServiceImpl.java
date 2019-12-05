@@ -74,9 +74,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
      */
     @Override
     public BigDecimal queryPostFee(Integer num, Integer addId, Integer productId, BigDecimal prices) {
-        //查询地址id的省份
         String province = acceptAddressService.getById(addId).getProvince();
-        //按照省的id
         Integer cityId = baseMapper.queryCityIdByAreaName(province);
         List<PostFee> postFee = baseMapper.queryPostFee(cityId, productId);
         if (postFee.size() == 0) {
