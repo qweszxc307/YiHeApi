@@ -1,6 +1,8 @@
 package org.crown.projects.pay.contorller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +48,10 @@ public class PayController extends SuperController {
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "请求支付接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderId", value = "订单id", required = true, paramType = "path"),
+            @ApiImplicitParam(name = "payType", value = "支付类型(0:微信支付,1:微信支付)", required = true, paramType = "body")
+    })
     @PostMapping(value = "/wxPay/{id}")
     public ApiResponses<JSONObject> wxPay(@PathVariable("id") Integer orderId, @RequestBody Integer payType) {
 
