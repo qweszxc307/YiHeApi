@@ -48,16 +48,15 @@ import java.util.UUID;
 @Validated
 public class AccountController extends SuperController {
     @Autowired
-    ICustomerService customerService;
+    private ICustomerService customerService;
     @Autowired
-    IMemberService memberService;
+    private IMemberService memberService;
     @Autowired
-    ILabelBrandService labelBrandService;
+    private ILabelBrandService labelBrandService;
     @Autowired
-    IAcceptAddressService acceptAddressService;
+    private IAcceptAddressService acceptAddressService;
     @Autowired
     private ILabelService labelService;
-
     @Autowired
     private QiNiuUtils qiNiuUtils;
 
