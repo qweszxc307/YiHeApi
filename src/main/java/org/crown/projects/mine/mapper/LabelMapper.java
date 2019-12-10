@@ -1,10 +1,8 @@
 package org.crown.projects.mine.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
-
 import org.apache.ibatis.annotations.Param;
 import org.crown.framework.mapper.BaseMapper;
-import org.crown.projects.mine.model.dto.LabelDTO;
 import org.crown.projects.mine.model.entity.Label;
 
 import java.util.List;
@@ -41,5 +39,5 @@ public interface LabelMapper extends BaseMapper<Label> {
      * @param brandId
      * @param openId
      */
-    void saveLabel(@Param("id") Integer id, @Param("brandId") Integer brandId, @Param("openId") String openId);
+    void saveLabel(@Param("id") Integer id, @Param("customerId")Integer customerId,@Param("brandId") Integer brandId, @Param("openId") String openId);
 }

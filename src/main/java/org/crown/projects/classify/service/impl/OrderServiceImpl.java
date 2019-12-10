@@ -20,6 +20,7 @@
  */
 package org.crown.projects.classify.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.crown.common.enums.OrderEnum;
 import org.crown.common.utils.CustomerUtils;
 import org.crown.framework.service.impl.BaseServiceImpl;
@@ -29,9 +30,12 @@ import org.crown.projects.classify.model.dto.ProductDTO;
 import org.crown.projects.classify.model.entity.Order;
 import org.crown.projects.classify.model.entity.OrderLogistics;
 import org.crown.projects.classify.model.entity.PostFee;
+import org.crown.projects.classify.model.entity.ProductPrice;
 import org.crown.projects.classify.service.IOrderLogisticsService;
 import org.crown.projects.classify.service.IOrderService;
+import org.crown.projects.classify.service.IProductPriceService;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
+import org.crown.projects.mine.model.entity.Coupon;
 import org.crown.projects.mine.model.entity.CouponCustomer;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.model.parm.OrderPARM;
@@ -54,6 +58,7 @@ import java.util.Objects;
  *
  * @author ykMa
  */
+@Slf4j
 @Service
 public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implements IOrderService {
     @Autowired
@@ -64,12 +69,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     private ICouponService couponService;
     @Autowired
     private ICouponCustomerService couponCustomerService;
+    @Autowired
+    private IProductPriceService productPriceService;
 
     /**
-     *
-     * @param num  购买的商品数量
-     * @param addId    收货地址id
-     * @param productId   产品id
+     * @param num       购买的商品数量
+     * @param addId     收货地址id
+     * @param productId 产品id
      * @param prices    商品的总价格
      * @return 邮费
      */
@@ -79,7 +85,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         Integer cityId = baseMapper.queryCityIdByAreaName(province);
         List<PostFee> postFee = baseMapper.queryPostFee(cityId, productId);
         if (postFee.size() == 0) {
-            return new BigDecimal("60");
+            return null;
         }
         for (PostFee fee : postFee) {
             BigDecimal freePrice = baseMapper.queryConfigById(fee.getConfigId());
@@ -90,16 +96,15 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
                 return fee.getPrice();
             }
         }
-
-        return new BigDecimal("100");
+        return null;
     }
 
     /**
-     *
-     * @param customer 客户信息
+     * @param customer  客户信息
      * @param orderPARM 订单信息
      * @return 订单
      */
+
 
     @Transactional(readOnly = false)
     @Override
@@ -109,14 +114,44 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         BigDecimal price = orderPARM.getPrice();
         Integer couponId = orderPARM.getCouponId();
         ProductDTO product = orderPARM.getProduct();
+        BigDecimal postFee1 = queryPostFee(product.getNum(), address.getId(), product.getId(), price);
+        if (postFee.compareTo(postFee1) != 0) {
+            log.error("邮费不正确：【传入邮费：" + postFee + ",运算出的邮费：" + postFee1 + " 】");
+            return null;
+        }
+        ProductPrice productPrice = productPriceService.query().eq(ProductPrice::getPid, product.getId()).ge(ProductPrice::getENum, product.getNum()).lt(ProductPrice::getSNum, product.getNum()).entity(e -> e);
+        if (productPrice.getPrice().compareTo(product.getPrice()) != 0) {
+            log.error("商品价格不正确:【传入价格：" + product.getPrice() + ",运算出的价格：" + productPrice.getPrice() + " 】");
+            return null;
+        }
+        BigDecimal add = productPrice.getPrice().multiply(new BigDecimal(product.getNum() + "")).add(postFee1);
         //创建订单
         Order order = new Order();
+        //设置优惠券id
+        if (Objects.nonNull(couponId)) {
+            Coupon coupon = couponService.getById(couponId);
+            if (coupon.getType() == 3) {
+                add = add.subtract(coupon.getDiscount());
+            }
+            if (coupon.getType() != 3) {
+                add = add.multiply(coupon.getDiscount());
+            }
+            //设置订单优惠券
+            order.setCouponId(couponId);
+            List<CouponCustomer> list = couponCustomerService.query().eq(CouponCustomer::getCouponId, couponId).eq(CouponCustomer::getOpenId, customer.getOpenId()).list();
+            for (int i = 0; i < 1; i++) {
+                //优惠券数量减少
+                couponService.deleteCouponCustomerById(list.get(i).getId());
+            }
+        }
+        if (price.compareTo(add) != 0) {
+            log.error("商品的总价格不正确：【传入价格：" + price + "，运算出的价格：" + add + " 】");
+            return null;
+        }
         //购买数量
         order.setNum(product.getNum());
         //设置订单类型
         order.setOrderType(orderPARM.getOrderType());
-        //生成订单号
-        order.setOrderNum(CustomerUtils.getOrderNum());
         //设置应付价格
         order.setTotalFee(price);
         //商品的单价
@@ -141,16 +176,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         order.setCloseTime(LocalDateTime.now().plusMinutes(OrderEnum.CLOSE_TIME.value()));
         //设置邮费
         order.setPostFee(postFee);
-        //设置折扣价
-        if (Objects.nonNull(couponId)) {
-            //设置订单优惠券
-            order.setCouponId(couponId);
-            List<CouponCustomer> list = couponCustomerService.query().eq(CouponCustomer::getCouponId, couponId).eq(CouponCustomer::getOpenId, customer.getOpenId()).list();
-            for (int i = 0; i < 1; i++) {
-                //优惠券数量减少
-                couponService.deleteCouponCustomerById(list.get(i).getId());
-            }
-        }
+
         //保存订单
         save(order);
         //设置订单快递信息

@@ -86,10 +86,12 @@ public class OrderRestController extends SuperController {
      * 邮费，商品信息，收货地址对象 订单价格，
      */
     public ApiResponses<OrderDTO> createOrder(@RequestBody OrderPARM orderPARM) {
-
         String openId = JWTUtils.getOpenId(getToken());
         Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
         OrderDTO order = orderService.createOrder(customer, orderPARM);
+        if (null == order) {
+            return success(HttpStatus.GATEWAY_TIMEOUT, null);
+        }
         return success(order);
     }
 

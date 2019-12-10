@@ -8,7 +8,7 @@
             DELETE FROM label_customer WHERE open_id = #{openId} AND brand_id = #{brandId}
    </delete>
 <insert id="saveLabel">
-   insert into label_customer(id,label_id,open_id,brand_id,create_time,update_time) values (null ,#{id},#{openId},#{brandId},NOW(),NOW());
+   insert into label_customer(id,label_id,customer_id,open_id,brand_id,create_time,update_time) values (null ,#{id},#{customerId},#{openId},#{brandId},NOW(),NOW());
 </insert>
 
 </mapper>

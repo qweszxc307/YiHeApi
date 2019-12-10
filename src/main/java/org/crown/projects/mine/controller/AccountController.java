@@ -29,7 +29,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -226,7 +225,8 @@ public class AccountController extends SuperController {
     @PutMapping(value = "/user/label/{id}")
     public ApiResponses<Void> updateLabel(@PathVariable("id") Integer id, @RequestBody List<LabelDTO> labelDTOS) {
         String openId = JWTUtils.getOpenId(getToken());
-        labelService.updateLabel(id, labelDTOS, openId);
+        Customer one = customerService.query().eq(Customer::getOpenId, openId).getOne();
+        labelService.updateLabel(id, one.getId(), labelDTOS, openId);
         return success();
     }
 

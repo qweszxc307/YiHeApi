@@ -61,11 +61,11 @@ public class LabelServiceImpl extends BaseServiceImpl<LabelMapper, Label> implem
 
         @Transactional
         @Override
-        public void updateLabel(Integer brandId, List<LabelDTO> labelDTOS, String openId) {
+        public void updateLabel(Integer brandId, Integer customerId, List<LabelDTO> labelDTOS, String openId) {
                 try {
                         baseMapper.deleteLabelByBrandIdAndOpenId(brandId, openId);
                         if (labelDTOS.size() != 0) {
-                                labelDTOS.forEach(e -> baseMapper.saveLabel(e.getId(), brandId, openId));
+                                labelDTOS.forEach(e -> baseMapper.saveLabel(e.getId(), customerId, brandId, openId));
                         }
                 } catch (Exception e) {
                         log.error("修改客户标签出错，原因是：" + e.getMessage());

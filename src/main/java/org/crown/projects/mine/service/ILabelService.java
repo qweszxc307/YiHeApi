@@ -44,9 +44,10 @@ public interface ILabelService extends BaseService<Label> {
 
     /**
      * 修改客户的标签
+     *
      * @param brandId
      * @param labelDTOS
      * @param openId
      */
-    void updateLabel(Integer brandId, List<LabelDTO> labelDTOS, String openId);
+    void updateLabel(Integer brandId, Integer customerId, List<LabelDTO> labelDTOS, String openId);
 }

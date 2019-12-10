@@ -41,7 +41,7 @@ public interface IOrderService extends BaseService<Order> {
      * @param num  购买的商品数量
      * @param addId    收货地址id
      * @param productId   产品id
-     * @param prices    商品的总价格
+     * @param prices    商品的总价d1格
      * @return 邮费
      */
     BigDecimal queryPostFee(Integer num, Integer addId, Integer productId, BigDecimal prices);

@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 public class ProductDTO extends Convert {
     private static final long serialVersionUID = 1L;
 
+
     @ApiModelProperty(notes = "id")
     private Integer id;
     @ApiModelProperty(notes = "name")
