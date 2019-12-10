@@ -119,7 +119,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             log.error("邮费不正确：【传入邮费：" + postFee + ",运算出的邮费：" + postFee1 + " 】");
             return null;
         }
-        ProductPrice productPrice = productPriceService.query().eq(ProductPrice::getPid, product.getId()).ge(ProductPrice::getENum, product.getNum()).lt(ProductPrice::getSNum, product.getNum()).entity(e -> e);
+        ProductPrice productPrice = productPriceService.query().eq(ProductPrice::getPid, product.getId()).ge(ProductPrice::getENum, product.getNum()).le(ProductPrice::getSNum, product.getNum()).entity(e -> e);
         if (productPrice.getPrice().compareTo(product.getPrice()) != 0) {
             log.error("商品价格不正确:【传入价格：" + product.getPrice() + ",运算出的价格：" + productPrice.getPrice() + " 】");
             return null;
