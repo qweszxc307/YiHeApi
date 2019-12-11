@@ -23,6 +23,7 @@ package org.crown.projects.classify.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.crown.common.enums.OrderEnum;
 import org.crown.common.utils.CustomerUtils;
+import org.crown.enums.OrderStatusEnum;
 import org.crown.framework.service.impl.BaseServiceImpl;
 import org.crown.projects.classify.mapper.OrderMapper;
 import org.crown.projects.classify.model.dto.OrderDTO;
@@ -159,7 +160,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         //设置商品名称
         order.setTitle(product.getName());
         //设置订单状态
-        order.setStatus(1);
+        order.setStatus(OrderStatusEnum.INIT);
         //设置商品id
         order.setProductId(product.getId());
         //设置用户id

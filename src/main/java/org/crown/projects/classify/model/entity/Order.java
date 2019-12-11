@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.enums.OrderStatusEnum;
 import org.crown.framework.model.BaseModel;
 
 import java.math.BigDecimal;
@@ -77,7 +78,7 @@ public class Order extends BaseModel {
     @ApiModelProperty(notes = "发票类型：（0无发票，1普通发票，2电子发票，3增值税发票）")
     private Integer invoiceType;
     @ApiModelProperty(notes = "订单状态：（ 1：未付款， 2：已付款，未发货， 3：已发货，未收货 4：已收货，未确认 5：确认收货，未评价 6：已评价）")
-    private Integer status;
+    private OrderStatusEnum status;
     @ApiModelProperty(notes = "下单时间")
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
