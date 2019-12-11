@@ -160,7 +160,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         //设置商品名称
         order.setTitle(product.getName());
         //设置订单状态
-        order.setStatus(OrderStatusEnum.INIT);
+        order.setStatus(OrderStatusEnum.INIT.value());
         //设置商品id
         order.setProductId(product.getId());
         //设置用户id

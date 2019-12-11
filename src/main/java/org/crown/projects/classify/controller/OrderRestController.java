@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiOperation;
 import org.crown.common.annotations.Resources;
 import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
+import org.crown.enums.OrderStatusEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.dto.OrderDTO;
@@ -109,14 +110,15 @@ public class OrderRestController extends SuperController {
             List<OrderDTO> entitys = orderService.query()
                     .eq(status != 0, Order::getStatus, status)
                     .eq(Order::getCustomerId, customer.getId())
-                    .gt(status == 1, Order::getCloseTime, LocalDateTime.now())
+                    .gt(status == OrderStatusEnum.INIT.value(), Order::getCloseTime, LocalDateTime.now())
                     .orderByDesc(Order::getCreateTime)
                     .entitys(e -> e.convert(OrderDTO.class));
             if (entitys.size() > 0) {
                 entitys.forEach(e->{
-                    if (e.getStatus() == 1 && e.getCloseTime().isAfter(LocalDateTime.now())) {
+                    if (e.getStatus().equals(OrderStatusEnum.INIT.value()) && e.getCloseTime().isAfter(LocalDateTime.now())) {
                         orders.add(e);
-                    } else {
+                    }
+                    if (!e.getStatus().equals(OrderStatusEnum.INIT.value())) {
                         orders.add(e);
                     }
                 });

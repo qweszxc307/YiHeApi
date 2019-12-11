@@ -7,8 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.crown.common.annotations.Resources;
-import org.crown.common.enums.OrderEnum;
-import org.crown.common.utils.HttpUtils;
 import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.enums.OrderStatusEnum;
@@ -66,7 +64,7 @@ public class PayController extends SuperController {
                     customer.setLastTime(LocalDateTime.now());
                     customer.setSum(customer.getSum().add(order.getTotalFee()));
                     customer.setOrderNum(customer.getOrderNum() + 1);
-                    order.setStatus(OrderStatusEnum.PAY_UP);
+                    order.setStatus(OrderStatusEnum.PAY_UP.value());
                     order.setPayTime(LocalDateTime.now());
                     customerService.updateById(customer);
                     orderService.updateById(order);
@@ -174,14 +172,20 @@ public class PayController extends SuperController {
             String prestr = PayUtil.createLinkString(validParams);
             //根据微信官网的介绍，此处不仅对回调的参数进行验签，还需要对返回的金额与系统订单的金额进行比对等
             if (PayUtil.verify(prestr, (String) map.get("sign"), key, "utf-8")) {
-                /**此处添加自己的业务逻辑代码start**/
+                /*此处添加自己的业务逻辑代码start*/
                 //注意要判断微信支付重复回调，支付成功后微信会重复的进行回调
+                LocalDateTime now = LocalDateTime.now();
                 String orderId = map.get("out_trade_no").toString();
                 Order order = orderService.getById(orderId);
-                if(order.getStatus().equals(OrderStatusEnum.INIT)){
-                    order.setStatus(OrderStatusEnum.PAY_UP);
-                    order.setPayTime(LocalDateTime.now());
+                if (order.getStatus().equals(OrderStatusEnum.INIT)) {
+                    order.setStatus(OrderStatusEnum.PAY_UP.value());
+                    order.setPayTime(now);
                     orderService.updateById(order);
+                    Customer customer = customerService.getById(order.getCustomerId());
+                    customer.setLastTime(now);
+                    customer.setSum(customer.getSum().add(order.getTotalFee()));
+                    customer.setOrderNum(customer.getOrderNum() + 1);
+                    customerService.updateById(customer);
                 }
                 //通知微信服务器已经支付成功
                 resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
