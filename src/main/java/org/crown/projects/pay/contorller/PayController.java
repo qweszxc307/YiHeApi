@@ -56,6 +56,7 @@ public class PayController extends SuperController {
         try {
             String openId = JWTUtils.getOpenId(getToken());
             Order order = orderService.getById(orderId);
+            order.setPaymentType(payType);
             if (payType == 1) {
                 //余额支付 查询用户的余额是否满足订单金额，如果不满足返回异常，如果满足则减少
                 Customer customer = customerService.query().eq(Customer::getOpenId, openId).getOne();

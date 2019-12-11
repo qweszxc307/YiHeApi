@@ -131,19 +131,24 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         //设置优惠券id
         if (Objects.nonNull(couponId)) {
             Coupon coupon = couponService.getById(couponId);
-            if (coupon.getType() == 3) {
-                add = add.subtract(coupon.getDiscount());
-            }
             if (coupon.getType() != 3) {
+                add = add.subtract(coupon.getDiscount());
+            }else {
                 add = add.multiply(coupon.getDiscount());
             }
             //设置订单优惠券
+            if (price.compareTo(add) != 0) {
+                log.error("商品的总价格不正确：【传入价格：" + price + "，运算出的价格：" + add + " 】");
+                return null;
+            }
             order.setCouponId(couponId);
             List<CouponCustomer> list = couponCustomerService.query().eq(CouponCustomer::getCouponId, couponId).eq(CouponCustomer::getOpenId, customer.getOpenId()).list();
             for (int i = 0; i < 1; i++) {
                 //优惠券数量减少
                 couponService.deleteCouponCustomerById(list.get(i).getId());
             }
+            coupon.setUsed(coupon.getUsed() + 1);
+            couponService.updateById(coupon);
         }
         if (price.compareTo(add) != 0) {
             log.error("商品的总价格不正确：【传入价格：" + price + "，运算出的价格：" + add + " 】");
@@ -171,8 +176,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         order.setOrderNum(CustomerUtils.getOrderNum());
         //订单图片
         order.setImage(product.getImgUrl());
-        //设置支付类型
-        order.setPaymentType(1);
         //设置交易关闭时间
         order.setCloseTime(LocalDateTime.now().plusMinutes(OrderEnum.CLOSE_TIME.value()));
         //设置邮费
@@ -211,6 +214,9 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             couponCustomer.setCouponId(order.getCouponId());
             couponCustomer.setOpenId(openId);
             couponCustomerService.save(couponCustomer);
+            Coupon coupon = couponService.getById(order.getCouponId());
+            coupon.setUsed(coupon.getUsed() - 1);
+            couponService.updateById(coupon);
         }
         OrderLogistics entity = orderLogisticsService.query().eq(OrderLogistics::getOrderId, orderId).entity(e -> e);
         orderLogisticsService.removeById(entity);
