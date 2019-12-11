@@ -1,4 +1,4 @@
-package org.crown.common.enums;
+package org.crown.enums;
 
 /**
  * @author ykMa

@@ -33,4 +33,6 @@ public class ProductDTO extends Convert {
     private BigDecimal price;
     @ApiModelProperty(notes = "商品购买数量，下单时候用")
     private Integer num;
+    @ApiModelProperty(notes = "库存")
+    private Integer stock;
 }

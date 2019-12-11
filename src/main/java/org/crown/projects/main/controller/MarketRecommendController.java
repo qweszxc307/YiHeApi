@@ -64,12 +64,6 @@ public class MarketRecommendController extends SuperController {
     @Autowired
     private IRecommendCustomerService recommendCustomerService;
 
-    @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private ICustomerService customerService;
-
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation("查询分享返礼产品")
@@ -92,49 +86,5 @@ public class MarketRecommendController extends SuperController {
         recommendCustomer.setCurrentOpenid(openId);
         recommendCustomerService.save(recommendCustomer);
         return success();
-    }
-
-    public void returnMoney(int orderType,int orderId){
-        /*当前用户openId*/
-        String curr_openId = JWTUtils.getOpenId(getToken());
-        /*当前生成的订单*/
-        Order order = orderService.getById(orderId);
-        if(orderType == 0){
-            /*判断当前用户下单产品是否为分享指定产品，并返回佣金额度*/
-            returnPayMoney(curr_openId,order);
-        }else if(orderType == 1){
-        }
-    }
-
-    public void returnPayMoney(String curr_openId,Order order){
-        RecommendCustomer recommendCustomer = recommendCustomerService.query().eq(RecommendCustomer::getOrderId,curr_openId).entity(e->e);
-        if(recommendCustomer != null){
-            /*获取指定商品订单*/
-            Integer active_orderId = recommendCustomer.getOrderId();
-            Order activeOrder = orderService.getById(active_orderId);
-            /*判断该商品是否继续参加分享返利活动*/
-            MarketRecommend marketRecommend = marketRecommendService.query().eq(MarketRecommend::getActivePid,activeOrder.getProductId()).eq(MarketRecommend::getStatus,0).entity(e->e);
-            if(marketRecommend !=null){
-            /*参加活动*/
-                /*获取指定商品订单对应的用户*/
-                Integer active_cuid = activeOrder.getCustomerId();
-                Customer active_customer = customerService.getById(active_cuid);
-                BigDecimal return_money = null;
-                /*判断商品是指定商品还是赠送商品*/
-                if(marketRecommend.getActivePid().equals(order.getProductId())){
-                    /*是指定商品*/
-                    return_money = marketRecommend.getBuyReturnMoney();
-                }else{
-                    /*是赠送商品*/
-                    return_money = marketRecommend.getPayReturnMoney();
-                }
-                BigDecimal bonus = active_customer.getBonus().add(return_money);
-                active_customer.setBonus(bonus);
-            }
-        }
-    }
-
-    public void returnSendMoney(int cuId){
-
     }
 }

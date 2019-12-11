@@ -21,7 +21,7 @@
 package org.crown.projects.classify.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.crown.common.enums.OrderEnum;
+import org.crown.enums.OrderEnum;
 import org.crown.common.utils.CustomerUtils;
 import org.crown.enums.OrderStatusEnum;
 import org.crown.framework.service.impl.BaseServiceImpl;
@@ -35,6 +35,7 @@ import org.crown.projects.classify.model.entity.ProductPrice;
 import org.crown.projects.classify.service.IOrderLogisticsService;
 import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.classify.service.IProductPriceService;
+import org.crown.projects.classify.service.IProductService;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
 import org.crown.projects.mine.model.entity.Coupon;
 import org.crown.projects.mine.model.entity.CouponCustomer;
@@ -72,6 +73,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     private ICouponCustomerService couponCustomerService;
     @Autowired
     private IProductPriceService productPriceService;
+    @Autowired
+    private IProductService productService;
 
     /**
      * @param num       购买的商品数量

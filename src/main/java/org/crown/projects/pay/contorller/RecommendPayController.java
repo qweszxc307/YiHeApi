@@ -40,11 +40,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-@Api(tags = {"支付"}, description = "微信支付")
+@Api(tags = {"支付"}, description = "分享返礼微信支付")
 @RestController
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
-public class PayController extends SuperController {
+public class RecommendPayController extends SuperController {
     @Autowired
     private ICustomerService customerService;
 
@@ -59,14 +59,13 @@ public class PayController extends SuperController {
 
 
     @Resources(auth = AuthTypeEnum.AUTH)
-    @ApiOperation(value = "请求支付接口")
+    @ApiOperation(value = "分享返礼请求支付接口")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "orderId", value = "订单id", required = true, paramType = "path"),
             @ApiImplicitParam(name = "payType", value = "支付类型(0:微信支付,1:微信支付)", required = true, paramType = "body")
     })
-    @PostMapping(value = "/wxPay/{id}")
-    public ApiResponses<JSONObject> wxPay(@PathVariable("id") Integer orderId, @RequestBody Integer payType) {
-
+    @PostMapping(value = "/wxRecommendPay/{id}")
+    public ApiResponses<JSONObject> wxRecommendPay(@PathVariable("id") Integer orderId, @RequestBody Integer payType) {
         try {
             String openId = JWTUtils.getOpenId(getToken());
             Order order = orderService.getById(orderId);
@@ -83,6 +82,7 @@ public class PayController extends SuperController {
                     order.setPayTime(LocalDateTime.now());
                     customerService.updateById(customer);
                     orderService.updateById(order);
+                    returnMoney(order.getOrderType(),orderId);
                     return success(HttpStatus.OK, null);
                 } else {
                     return success(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE, null);
@@ -94,7 +94,6 @@ public class PayController extends SuperController {
                 String body = "测试商品名称";
                 //获取客户端的ip地址
                 String spbill_create_ip = WxUtils.getIpAddr(request);
-
                 //组装参数，用户生成统一下单接口的签名
                 Map<String, String> packageParams = new HashMap<>();
                 packageParams.put("appid", appId);
@@ -104,7 +103,7 @@ public class PayController extends SuperController {
                 packageParams.put("out_trade_no", orderId + "");//商户订单号,自己的订单ID
                 packageParams.put("total_fee", 1 + "");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
                 packageParams.put("spbill_create_ip", spbill_create_ip);
-                packageParams.put("notify_url", WxApiEnum.WX_PAY_BACK_API.value());//支付成功后的回调地址
+                packageParams.put("notify_url", WxApiEnum.WX_RECOMMEND_BACK_API.value());//支付成功后的回调地址
                 packageParams.put("trade_type", TRADETYPE);//支付方式
                 packageParams.put("openid", JWTUtils.getOpenId(getToken()) + "");//用户的openID，自己获取
 
@@ -118,7 +117,7 @@ public class PayController extends SuperController {
                         + "<body><![CDATA[" + body + "]]></body>"
                         + "<mch_id>" + mchId + "</mch_id>"
                         + "<nonce_str>" + nonce_str + "</nonce_str>"
-                        + "<notify_url>" + WxApiEnum.WX_PAY_BACK_API.value() + "</notify_url>"
+                        + "<notify_url>" + WxApiEnum.WX_RECOMMEND_BACK_API.value() + "</notify_url>"
                         + "<openid>" + JWTUtils.getOpenId(getToken()) + "</openid>"
                         + "<out_trade_no>" + orderId + "</out_trade_no>"
                         + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
@@ -129,10 +128,13 @@ public class PayController extends SuperController {
 
                 //调用统一下单接口，并接受返回的结果
                 String result = PayUtil.httpRequest(WxApiEnum.WX_ORDER_API.value(), "POST", xml);
+
                 // 将解析结果存储在HashMap中
                 Map map = PayUtil.doXMLParse(result);
+
                 String return_code = (String) map.get("return_code");//返回状态码
                 String result_code = (String) map.get("result_code");//返回状态码
+
                 JSONObject response = new JSONObject();//返回给小程序端需要的参数
                 if (return_code.equals("SUCCESS") && return_code.equals(result_code)) {
                     String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
@@ -158,9 +160,9 @@ public class PayController extends SuperController {
 
     //这里是支付回调接口，微信支付成功后会自动调用
     @Resources(auth = AuthTypeEnum.OPEN)
-    @PostMapping(value = "/wxNotify")
+    @PostMapping(value = "/wxRecommendBack")
     public void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
-         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
         String line = null;
         StringBuilder sb = new StringBuilder();
         while ((line = br.readLine()) != null) {
@@ -170,7 +172,9 @@ public class PayController extends SuperController {
         //sb为微信返回的xml
         String notityXml = sb.toString();
         String resXml = "";
+
         Map map = PayUtil.doXMLParse(notityXml);
+
         String returnCode = (String) map.get("return_code");
         if ("SUCCESS".equals(returnCode)) {
             //验证签名是否正确
@@ -184,6 +188,7 @@ public class PayController extends SuperController {
                 int orderId = Integer.parseInt(map.get("out_trade_no").toString());
                 Order order = orderService.getById(orderId);
                 if (order.getStatus().equals(OrderStatusEnum.INIT)) {
+                    returnMoney(order.getOrderType(),orderId);
                     order.setStatus(OrderStatusEnum.PAY_UP.value());
                     order.setPayTime(now);
                     orderService.updateById(order);
@@ -207,5 +212,50 @@ public class PayController extends SuperController {
         out.write(resXml.getBytes());
         out.flush();
         out.close();
+    }
+
+
+    public void returnMoney(int orderType,int orderId){
+        /*当前用户openId*/
+        String curr_openId = JWTUtils.getOpenId(getToken());
+        /*当前生成的订单*/
+        Order order = orderService.getById(orderId);
+        if(orderType == 0){
+        }else if(orderType == 1){
+            /*判断当前用户下单产品是否为分享指定产品，并返回佣金额度*/
+            returnPayMoney(curr_openId,order);
+        }
+    }
+
+    public void returnPayMoney(String curr_openId,Order order){
+        RecommendCustomer recommendCustomer = recommendCustomerService.query().eq(RecommendCustomer::getOrderId,curr_openId).entity(e->e);
+        if(recommendCustomer != null){
+            /*获取指定商品订单*/
+            Integer active_orderId = recommendCustomer.getOrderId();
+            Order activeOrder = orderService.getById(active_orderId);
+            /*判断该商品是否继续参加分享返利活动*/
+            MarketRecommend marketRecommend = marketRecommendService.query().eq(MarketRecommend::getActivePid,activeOrder.getProductId()).eq(MarketRecommend::getStatus,0).entity(e->e);
+            if(marketRecommend !=null){
+                /*参加活动*/
+                /*获取指定商品订单对应的用户*/
+                Integer active_cuid = activeOrder.getCustomerId();
+                Customer active_customer = customerService.getById(active_cuid);
+                BigDecimal return_money = null;
+                /*判断商品是指定商品还是赠送商品*/
+                if(marketRecommend.getActivePid().equals(order.getProductId())){
+                    /*是指定商品*/
+                    return_money = marketRecommend.getBuyReturnMoney();
+                }else{
+                    /*是赠送商品*/
+                    return_money = marketRecommend.getPayReturnMoney();
+                }
+                BigDecimal bonus = active_customer.getBonus().add(return_money);
+                active_customer.setBonus(bonus);
+            }
+        }
+    }
+
+    public void returnSendMoney(int cuId){
+
     }
 }
