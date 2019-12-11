@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.crown.common.annotations.Resources;
+import org.crown.common.utils.HttpUtils;
 import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
@@ -42,9 +43,6 @@ public class PayController extends SuperController {
 
     @Autowired
     private IOrderService orderService;
-
-    public PayController() {
-    }
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "请求支付接口")
@@ -125,7 +123,7 @@ public class PayController extends SuperController {
                 String result_code = (String) map.get("result_code");//返回状态码
 
                 JSONObject response = new JSONObject();//返回给小程序端需要的参数
-                if (return_code == "SUCCESS" && return_code.equals(result_code)) {
+                if (return_code.equals("SUCCESS") && return_code.equals(result_code)) {
                     String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
                     response.put("nonceStr", nonce_str);
                     response.put("package", "prepay_id=" + prepay_id);
@@ -150,6 +148,8 @@ public class PayController extends SuperController {
     }
 
     //这里是支付回调接口，微信支付成功后会自动调用
+    @Resources(auth = AuthTypeEnum.OPEN)
+    @ApiOperation(value = "请求支付成功回调接口")
     @PostMapping(value = "/wxNotify")
     public void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
