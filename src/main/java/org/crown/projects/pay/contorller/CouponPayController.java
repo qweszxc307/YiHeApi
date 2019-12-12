@@ -64,7 +64,7 @@ public class CouponPayController extends SuperController {
                 customerCouponService.save(customerCoupon);
             } else {
                 customerCoupon = customerCouponService.query().eq(CustomerCoupon::getOpenId, openId).entity(e -> e);
-                if (customerCoupon.getStatus().equals(CustomerCouponEnum.UNPAID.value())) {
+                if (customerCoupon.getStatus().equals(CustomerCouponEnum.PAID.value())) {
                     return success(HttpStatus.NOT_ACCEPTABLE, null);
                 }
             }
@@ -83,7 +83,7 @@ public class CouponPayController extends SuperController {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", customerCoupon.getId() + "");//商户订单号,自己的订单ID
-            packageParams.put("total_fee", 100 + "");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", 1 + "");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxApiEnum.WX_PAY_COUPON_BACK_API.value());//支付成功后的回调地址
             packageParams.put("trade_type", TRADETYPE);//支付方式
@@ -103,13 +103,13 @@ public class CouponPayController extends SuperController {
                     + "<openid>" + JWTUtils.getOpenId(getToken()) + "</openid>"
                     + "<out_trade_no>" + customerCoupon.getId() + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + 100 + "</total_fee>"//支付的金额，单位：分
+                    + "<total_fee>" + 1 + "</total_fee>"//支付的金额，单位：分
                     + "<trade_type>" + TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
 
             //调用统一下单接口，并接受返回的结果
-            String result = PayUtil.httpRequest(WxApiEnum.WX_PAY_COUPON_BACK_API.value(), "POST", xml);
+            String result = PayUtil.httpRequest(WxApiEnum.WX_ORDER_API.value(), "POST", xml);
             // 将解析结果存储在HashMap中
             Map map = PayUtil.doXMLParse(result);
             String return_code = (String) map.get("return_code");//返回状态码
@@ -168,6 +168,8 @@ public class CouponPayController extends SuperController {
                     customerCouponService.updateById(customerCoupon);
                     List<Coupon> list = couponService.query().eq(Coupon::getStatus, 0).eq(Coupon::getRule, 5).list();
                     CouponCustomer couponCustomer = new CouponCustomer();
+                    couponCustomer.setOpenId(customerCoupon.getOpenId());
+                    couponCustomer.setCreateTime(now);
                     list.forEach(e->{
                         e.setProvide(e.getProvide() + 1);
                         couponCustomer.setCouponId(e.getId());
