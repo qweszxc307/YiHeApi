@@ -85,7 +85,7 @@ public class CouponPayController extends SuperController {
             packageParams.put("out_trade_no", customerCoupon.getId() + "");//商户订单号,自己的订单ID
             packageParams.put("total_fee", 100 + "");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
-            packageParams.put("notify_url", WxApiEnum.WX_PAY_BACK_API.value());//支付成功后的回调地址
+            packageParams.put("notify_url", WxApiEnum.WX_PAY_COUPON_BACK_API.value());//支付成功后的回调地址
             packageParams.put("trade_type", TRADETYPE);//支付方式
             packageParams.put("openid", JWTUtils.getOpenId(getToken()) + "");//用户的openID，自己获取
 
@@ -99,7 +99,7 @@ public class CouponPayController extends SuperController {
                     + "<body><![CDATA[" + body + "]]></body>"
                     + "<mch_id>" + mchId + "</mch_id>"
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
-                    + "<notify_url>" + WxApiEnum.WX_PAY_BACK_API.value() + "</notify_url>"
+                    + "<notify_url>" + WxApiEnum.WX_PAY_COUPON_BACK_API.value() + "</notify_url>"
                     + "<openid>" + JWTUtils.getOpenId(getToken()) + "</openid>"
                     + "<out_trade_no>" + customerCoupon.getId() + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
