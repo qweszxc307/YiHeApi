@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.crown.common.annotations.Resources;
 import org.crown.common.utils.JWTUtils;
 import org.crown.common.utils.WxUtils;
@@ -16,10 +15,6 @@ import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.entity.Order;
 import org.crown.projects.classify.service.IOrderService;
-import org.crown.projects.main.model.entity.MarketRecommend;
-import org.crown.projects.main.model.entity.RecommendCustomer;
-import org.crown.projects.main.services.IMarketRecommendService;
-import org.crown.projects.main.services.IRecommendCustomerService;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.service.ICustomerService;
 import org.crown.projects.pay.utlis.PayUtil;
@@ -34,11 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 @Api(tags = {"支付"}, description = "微信支付")
 @RestController
@@ -51,13 +44,6 @@ public class PayController extends SuperController {
     @Autowired
     private IOrderService orderService;
 
-    @Autowired
-    private IMarketRecommendService marketRecommendService;
-
-    @Autowired
-    private IRecommendCustomerService recommendCustomerService;
-
-
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "请求支付接口")
     @ApiImplicitParams({
@@ -65,7 +51,7 @@ public class PayController extends SuperController {
             @ApiImplicitParam(name = "payType", value = "支付类型(0:微信支付,1:微信支付)", required = true, paramType = "body")
     })
     @PostMapping(value = "/wxPay/{id}")
-    public ApiResponses<JSONObject> wxPay(@PathVariable("id") Integer orderId, @RequestBody Integer payType) {
+    public ApiResponses<JSONObject> wxPay(@PathVariable("id") Integer orderId,   @RequestBody Integer payType) {
 
         try {
             String openId = JWTUtils.getOpenId(getToken());
@@ -160,7 +146,7 @@ public class PayController extends SuperController {
     @Resources(auth = AuthTypeEnum.OPEN)
     @PostMapping(value = "/wxNotify")
     public void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
-         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
         String line = null;
         StringBuilder sb = new StringBuilder();
         while ((line = br.readLine()) != null) {
