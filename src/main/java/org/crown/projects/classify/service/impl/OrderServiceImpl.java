@@ -36,6 +36,8 @@ import org.crown.projects.classify.service.IOrderLogisticsService;
 import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.classify.service.IProductPriceService;
 import org.crown.projects.classify.service.IProductService;
+import org.crown.projects.main.model.entity.RecommendCustomer;
+import org.crown.projects.main.service.IRecommendCustomerService;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
 import org.crown.projects.mine.model.entity.Coupon;
 import org.crown.projects.mine.model.entity.CouponCustomer;
@@ -75,6 +77,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     private IProductPriceService productPriceService;
     @Autowired
     private IProductService productService;
+    @Autowired
+    private IRecommendCustomerService recommendCustomerService;
 
     /**
      * @param num       购买的商品数量
@@ -120,7 +124,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         ProductDTO product = orderPARM.getProduct();
         //创建订单
         Order order = new Order();
-        if (orderPARM.getOrderType() != 1) {
+        if (orderPARM.getOrderType() != 1&&orderPARM.getOrderType() != 2) {
             BigDecimal postFee1 = queryPostFee(product.getNum(), address.getId(), product.getId(), price);
             if (postFee.compareTo(postFee1) != 0) {
                 log.error("邮费不正确：【传入邮费：" + postFee + ",运算出的邮费：" + postFee1 + " 】");
@@ -190,6 +194,15 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
 
         //保存订单
         save(order);
+        //若是分享返礼领取订单，则添加与分享订单的关联关系
+         if(order.getOrderType().equals(OrderStatusEnum.RECOMMEND_SEND_ORDER.value()) ){
+            RecommendCustomer recommendCustomer = new RecommendCustomer();
+            recommendCustomer.setCurrentOpenid(customer.getOpenId());
+            recommendCustomer.setOrderId(orderPARM.getParentOrderId());
+            recommendCustomer.setCurOrderId(order.getId());
+            recommendCustomer.setRecommendId(orderPARM.getRecommendId());
+            recommendCustomerService.save(recommendCustomer);
+        }
         //设置订单快递信息
         OrderLogistics orderLogistics = new OrderLogistics();
         //设置订单号id

@@ -18,23 +18,23 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.main.services.impl;
+package org.crown.projects.main.service;
 
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.main.mapper.RecommendCustomerMapper;
-import org.crown.projects.main.model.entity.RecommendCustomer;
-import org.crown.projects.main.services.IRecommendCustomerService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.crown.framework.service.BaseService;
+import org.crown.projects.main.model.dto.RecommendProductPageDTO;
+import org.crown.projects.main.model.entity.MarketRecommend;
+
+import java.util.List;
 
 /**
  * <p>
- * 推荐返礼用户信息表 服务实现类
+ * 推荐返礼信息表 服务类
  * </p>
  *
  * @author whZhang
  */
-@Service
-public class RecommendCustomerServiceImpl extends BaseServiceImpl<RecommendCustomerMapper, RecommendCustomer>implements IRecommendCustomerService {
+public interface IMarketRecommendService extends BaseService<MarketRecommend> {
+
+        List<RecommendProductPageDTO> selectRecommendProducts();
 
 }

@@ -18,30 +18,35 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.main.services.impl;
+package org.crown.projects.main.model.entity;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.crown.framework.service.impl.BaseServiceImpl;
-import org.crown.projects.main.mapper.MarketRecommendMapper;
-import org.crown.projects.main.model.dto.RecommendProductPageDTO;
-import org.crown.projects.main.model.entity.MarketRecommend;
-import org.crown.projects.main.services.IMarketRecommendService;
-import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.annotation.TableName;
+import org.crown.framework.model.BaseModel;
 
-import java.util.List;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 
 /**
  * <p>
- * 推荐返礼信息表 服务实现类
+ * 推荐返礼订单关系表
  * </p>
  *
  * @author whZhang
  */
-@Service
-public class MarketRecommendServiceImpl extends BaseServiceImpl<MarketRecommendMapper, MarketRecommend> implements IMarketRecommendService {
+@TableName("recommend_order")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class RecommendOrder extends BaseModel {
 
-        @Override
-        public List<RecommendProductPageDTO> selectRecommendProducts() {
-                return baseMapper.selectRecommendProducts();
-        }
+private static final long serialVersionUID=1L;
+
+    @ApiModelProperty(notes = "推荐返礼id")
+private Integer recommendId;
+    @ApiModelProperty(notes = "订单id")
+private Integer orderId;
+
 }

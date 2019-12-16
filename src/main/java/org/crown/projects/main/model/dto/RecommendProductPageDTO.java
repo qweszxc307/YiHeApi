@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.framework.model.BaseModel;
 import org.crown.framework.model.convert.Convert;
 
 import java.math.BigDecimal;
@@ -19,7 +20,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class RecommendProductPageDTO {
+public class RecommendProductPageDTO extends BaseModel {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(notes = "指定推荐产品id")
