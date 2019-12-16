@@ -30,6 +30,7 @@ public class OrderPARM  extends Convert {
     private AcceptAddressDTO address;
     private BigDecimal price;
     private Integer couponId;
-
+    private Integer parentOrderId;
+    private Integer recommendId;
 
 }

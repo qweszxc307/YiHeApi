@@ -29,21 +29,15 @@ import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
-import org.crown.projects.classify.model.entity.Order;
-import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.main.model.dto.RecommendProductPageDTO;
-import org.crown.projects.main.model.entity.MarketRecommend;
 import org.crown.projects.main.model.entity.RecommendCustomer;
-import org.crown.projects.main.services.IMarketRecommendService;
-import org.crown.projects.main.services.IRecommendCustomerService;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.service.ICustomerService;
+import org.crown.projects.main.service.IMarketRecommendService;
+import org.crown.projects.main.service.IRecommendCustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**

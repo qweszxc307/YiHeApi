@@ -18,46 +18,22 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.main.model.entity;
+package org.crown.projects.main.service.impl;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import org.crown.framework.model.BaseModel;
-
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-
+import org.crown.framework.service.impl.BaseServiceImpl;
+import org.crown.projects.main.mapper.RecommendCustomerMapper;
+import org.crown.projects.main.model.entity.RecommendCustomer;
+import org.crown.projects.main.service.IRecommendCustomerService;
+import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 推荐返礼用户信息表
+ * 推荐返礼用户信息表 服务实现类
  * </p>
  *
  * @author whZhang
  */
-@TableName("recommend_customer")
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class RecommendCustomer extends BaseModel {
-
-private static final long serialVersionUID=1L;
-
-    @ApiModelProperty(notes = "订单Id")
-private Integer orderId;
-    @ApiModelProperty(notes = "推荐人id")
-private String currentOpenid;
-    @ApiModelProperty(notes = "推荐返礼id")
-    private Integer recommendId;
-    @ApiModelProperty(notes = "当前订单id")
-    private Integer curOrderId;
-    @ApiModelProperty(notes = "创建时间")
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+@Service
+public class RecommendCustomerServiceImpl extends BaseServiceImpl<RecommendCustomerMapper, RecommendCustomer>implements IRecommendCustomerService {
 
 }

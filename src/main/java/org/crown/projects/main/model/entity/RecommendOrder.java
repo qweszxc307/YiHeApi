@@ -20,8 +20,6 @@
  */
 package org.crown.projects.main.model.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import org.crown.framework.model.BaseModel;
 
@@ -30,34 +28,25 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 
 /**
  * <p>
- * 推荐返礼用户信息表
+ * 推荐返礼订单关系表
  * </p>
  *
  * @author whZhang
  */
-@TableName("recommend_customer")
+@TableName("recommend_order")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class RecommendCustomer extends BaseModel {
+public class RecommendOrder extends BaseModel {
 
 private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(notes = "订单Id")
-private Integer orderId;
-    @ApiModelProperty(notes = "推荐人id")
-private String currentOpenid;
     @ApiModelProperty(notes = "推荐返礼id")
-    private Integer recommendId;
-    @ApiModelProperty(notes = "当前订单id")
-    private Integer curOrderId;
-    @ApiModelProperty(notes = "创建时间")
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+private Integer recommendId;
+    @ApiModelProperty(notes = "订单id")
+private Integer orderId;
 
 }

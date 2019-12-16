@@ -18,23 +18,18 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.main.services;
+package org.crown.projects.main.service;
 
 import org.crown.framework.service.BaseService;
-import org.crown.projects.main.model.dto.RecommendProductPageDTO;
-import org.crown.projects.main.model.entity.MarketRecommend;
-
-import java.util.List;
+import org.crown.projects.main.model.entity.RecommendCustomer;
 
 /**
  * <p>
- * 推荐返礼信息表 服务类
+ * 推荐返礼用户信息表 服务类
  * </p>
  *
  * @author whZhang
  */
-public interface IMarketRecommendService extends BaseService<MarketRecommend> {
-
-        List<RecommendProductPageDTO> selectRecommendProducts();
+public interface IRecommendCustomerService extends BaseService<RecommendCustomer> {
 
 }

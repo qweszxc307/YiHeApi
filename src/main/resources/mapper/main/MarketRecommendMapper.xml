@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.crown.projects.main.mapper.MarketRecommendMapper">
     <select id="selectRecommendProducts" parameterType="java.lang.String" resultType="org.crown.projects.main.model.dto.RecommendProductPageDTO">
-        select a.active_pid,a.send_pid,a.carriage_price,a.member_name,a.active_name,a.active_stock,a.send_name,a.active_product_price,a.send_price,a.active_img_url,i.img_url send_img_url from (
+        select a.id,a.active_pid,a.send_pid,a.carriage_price,a.member_name,a.active_name,a.active_stock,a.send_name,a.active_product_price,a.send_price,a.active_img_url,i.img_url send_img_url from (
             select mr.*,
             m.name member_name,
             p.name active_name,
@@ -30,5 +30,15 @@
             on i.id = pi.img_id
             where a.status = 0
             group by a.active_pid,a.send_pid
+    </select>
+
+    <select id="queryReturnBuyCustomer" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select c.id,c.open_id from (
+            select rc.current_openid,o.product_id,o.customer_id from recommend_customer rc
+            inner join `order` o
+            on o.id = rc.order_id and o.`status` = 2 and o.product_id = #{productId}
+            )a inner join customer c
+            on c.id = a.customer_id
+            group by c.open_id
     </select>
 </mapper>

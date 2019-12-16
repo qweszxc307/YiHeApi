@@ -18,14 +18,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.main.services.impl;
+package org.crown.projects.main.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.crown.framework.service.impl.BaseServiceImpl;
 import org.crown.projects.main.mapper.MarketRecommendMapper;
 import org.crown.projects.main.model.dto.RecommendProductPageDTO;
 import org.crown.projects.main.model.entity.MarketRecommend;
-import org.crown.projects.main.services.IMarketRecommendService;
+import org.crown.projects.main.service.IMarketRecommendService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
