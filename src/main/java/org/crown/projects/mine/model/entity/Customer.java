@@ -48,12 +48,15 @@ public class Customer extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
+
     @ApiModelProperty(notes = "id")
     private Integer id;
     @ApiModelProperty(notes = "open_id")
     private String openId;
     @ApiModelProperty(notes = "union_id")
     private String unionId;
+    @ApiModelProperty(notes = "上级id")
+    private String parentId;
     @ApiModelProperty(notes = "会员号")
     private String memberNum;
     @ApiModelProperty(notes = "等级表id")
