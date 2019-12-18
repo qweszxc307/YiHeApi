@@ -37,4 +37,7 @@ public interface IMarketRecommendService extends BaseService<MarketRecommend> {
 
         List<RecommendProductPageDTO> selectRecommendProducts();
 
+        RecommendProductPageDTO selectRecommendProductByRId(Integer recommendId);
+
+        Integer countPayNum(Integer orderID,Integer recommendId);
 }

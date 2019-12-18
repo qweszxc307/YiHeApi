@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.crown.framework.mapper.BaseMapper;
 import org.crown.projects.main.model.dto.RecommendProductPageDTO;
 import org.crown.projects.main.model.entity.MarketRecommend;
+import org.crown.projects.pay.service.IRecommendPayService;
 
 import java.util.List;
 import java.util.Map;
@@ -33,4 +34,8 @@ public interface MarketRecommendMapper extends BaseMapper<MarketRecommend> {
      * @return Result<RecommendProductPageDTO>
      */
     List<Map> queryReturnBuyCustomer(@Param("productId") Integer productId);
+
+    RecommendProductPageDTO selectRecommendProductByRId(@Param("recommendId") Integer recommendId);
+
+    Integer countPayNum(@Param("orderId") Integer orderId,@Param("recommendId") Integer recommendId);
 }

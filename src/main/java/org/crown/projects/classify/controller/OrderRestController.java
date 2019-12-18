@@ -33,6 +33,8 @@ import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.dto.OrderDTO;
 import org.crown.projects.classify.model.entity.Order;
 import org.crown.projects.classify.service.IOrderService;
+import org.crown.projects.main.model.entity.RecommendOrder;
+import org.crown.projects.main.service.IRecommendOrderService;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.model.parm.OrderPARM;
 import org.crown.projects.mine.service.ICustomerService;
@@ -63,6 +65,8 @@ public class OrderRestController extends SuperController {
     private IOrderService orderService;
     @Autowired
     private ICustomerService customerService;
+    @Autowired
+    private IRecommendOrderService recommendOrderService;
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation("查询运费")
@@ -110,9 +114,17 @@ public class OrderRestController extends SuperController {
             List<OrderDTO> entitys = orderService.query()
                     .eq(status != 0, Order::getStatus, status)
                     .eq(Order::getCustomerId, customer.getId())
-                    .gt(status == OrderStatusEnum.INIT.value(), Order::getCloseTime, LocalDateTime.now())
+                    .gt(status.equals(OrderStatusEnum.INIT.value()), Order::getCloseTime, LocalDateTime.now())
                     .orderByDesc(Order::getCreateTime)
-                    .entitys(e -> e.convert(OrderDTO.class));
+                    .entitys(e -> {
+                        OrderDTO orderDTO = e.convert(OrderDTO.class);
+                        if(orderDTO.getOrderType().equals(OrderStatusEnum.RECOMMEND_ORDER.value())){
+                            /*推荐返礼产品订单-添加推荐返礼关联关系*/
+                            RecommendOrder recommendOrder = recommendOrderService.query().eq(RecommendOrder::getOrderId,orderDTO.getId()).entity(f->f);
+                            orderDTO.setRecommendId(recommendOrder.getRecommendId());
+                        }
+                        return orderDTO;
+                    });
             if (entitys.size() > 0) {
                 entitys.forEach(e->{
                     if (e.getStatus().equals(OrderStatusEnum.INIT.value()) && e.getCloseTime().isAfter(LocalDateTime.now())) {
@@ -138,8 +150,6 @@ public class OrderRestController extends SuperController {
             @ApiImplicitParam(name = "id", value = "订单id", required = true, paramType = "path")
     })
     public ApiResponses<Void> deleteOrder(@PathVariable("id") Integer id) {
-
-
         orderService.deleteOrder(id, JWTUtils.getOpenId(getToken()));
         return success();
     }

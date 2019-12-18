@@ -32,6 +32,39 @@
             group by a.active_pid,a.send_pid
     </select>
 
+    <select id="selectRecommendProductByRId" parameterType="java.lang.Integer" resultType="org.crown.projects.main.model.dto.RecommendProductPageDTO">
+        select a.id,a.active_pid,a.send_pid,a.carriage_price,a.member_name,a.active_name,a.active_stock,a.send_name,a.active_product_price,a.send_price,a.active_img_url,i.img_url send_img_url from (
+            select mr.*,
+            m.name member_name,
+            p.name active_name,
+            p.stock active_stock,
+            (select name from product where product.id = mr.send_pid) send_name,
+            pr.price active_product_price,
+            (select price from product_price  where product_price.pid = mr.send_pid and product_price.s_num = 1) send_price,
+            i.img_url active_img_url
+                from market_recommend mr
+                left join member m
+                on m.id = mr.member_id
+                left join product p
+                on p.id = mr.active_pid
+                left join product_price pr
+                on pr.pid=p.id
+                and pr.s_num = 1
+                left join (select pi.p_id,pi.img_id from product_image pi inner join market_recommend mr on mr.active_pid = pi.p_id group BY mr.active_pid) pi
+                on pi.p_id = mr.active_pid
+                left join image i
+                on i.id = pi.img_id
+            )a
+            inner join product_image pi
+            on pi.p_id = a.send_pid
+            inner join image i
+            on i.id = pi.img_id
+            where a.status = 0
+            and
+	        a.id = #{recommendId}
+            group by a.active_pid,a.send_pid
+    </select>
+
     <select id="queryReturnBuyCustomer" parameterType="java.lang.Integer" resultType="java.util.Map">
         select c.id,c.open_id from (
             select rc.current_openid,o.product_id,o.customer_id from recommend_customer rc
@@ -40,5 +73,9 @@
             )a inner join customer c
             on c.id = a.customer_id
             group by c.open_id
+    </select>
+    
+    <select id="countPayNum" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select count(*) from recommend_customer rc inner join `order` o on o.id = rc.cur_order_id where rc.order_id = #{orderId} and o.`status` = 2 and rc.recommend_id = #{recommendId}
     </select>
 </mapper>

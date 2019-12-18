@@ -64,6 +64,8 @@ public class OrderDTO extends BaseModel {
     private BigDecimal price;
     @ApiModelProperty(notes = "折扣后的价格")
     private BigDecimal discountPrice;
+    @ApiModelProperty(notes = "推荐返礼id")
+    private Integer recommendId;
     @ApiModelProperty(notes = "商品图片")
     private String image;
     @ApiModelProperty(notes = "订单状态：（ 1：未付款， 2：已付款，未发货， 3：已发货，未收货 4：已收货，未确认 5：确认收货，未评价 6：已评价）")

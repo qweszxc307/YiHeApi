@@ -43,4 +43,14 @@ public class MarketRecommendServiceImpl extends BaseServiceImpl<MarketRecommendM
         public List<RecommendProductPageDTO> selectRecommendProducts() {
                 return baseMapper.selectRecommendProducts();
         }
+
+        @Override
+        public RecommendProductPageDTO selectRecommendProductByRId(Integer recommendId) {
+                return baseMapper.selectRecommendProductByRId(recommendId);
+        }
+
+        @Override
+        public Integer countPayNum(Integer orderID, Integer recommendId) {
+                return baseMapper.countPayNum(orderID,recommendId);
+        }
 }

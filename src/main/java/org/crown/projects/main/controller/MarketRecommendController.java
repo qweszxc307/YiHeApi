@@ -24,16 +24,30 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import net.sf.json.JSONObject;
 import org.crown.common.annotations.Resources;
+import org.crown.common.utils.CustomerUtils;
 import org.crown.common.utils.JWTUtils;
 import org.crown.enums.AuthTypeEnum;
+import org.crown.enums.OrderStatusEnum;
+import org.crown.enums.RecommendStatusEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
+import org.crown.projects.classify.model.entity.Order;
+import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.main.model.dto.RecommendProductPageDTO;
+import org.crown.projects.main.model.entity.MarketRecommend;
 import org.crown.projects.main.model.entity.RecommendCustomer;
 import org.crown.projects.main.service.IMarketRecommendService;
 import org.crown.projects.main.service.IRecommendCustomerService;
+import org.crown.projects.main.service.IRecommendOrderService;
+import org.crown.projects.mine.model.entity.Customer;
+import org.crown.projects.mine.model.entity.Member;
+import org.crown.projects.mine.service.ICustomerService;
+import org.crown.projects.mine.service.IMemberService;
+import org.crown.projects.pay.service.IRecommendPayService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +72,15 @@ public class MarketRecommendController extends SuperController {
     @Autowired
     private IRecommendCustomerService recommendCustomerService;
 
+    @Autowired
+    private ICustomerService customerService;
+
+    @Autowired
+    private IOrderService orderService;
+
+    @Autowired
+    private IMemberService memberService;
+
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation("查询分享返礼产品")
@@ -65,6 +88,17 @@ public class MarketRecommendController extends SuperController {
     public ApiResponses<List<RecommendProductPageDTO>> get() {
         List<RecommendProductPageDTO> list = marketRecommendService.selectRecommendProducts();
         return success(list);
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("查询单个分享返礼产品")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "recommendId", value = "订单ID", required = true, paramType = "path")
+    })
+    @GetMapping(value="/recommend/products/{recommendId}")
+    public ApiResponses<RecommendProductPageDTO> getByRecommendId(@PathVariable("recommendId") Integer recommendId) {
+        RecommendProductPageDTO recommendProductPageDTO = marketRecommendService.selectRecommendProductByRId(recommendId);
+        return success(recommendProductPageDTO);
     }
 
     @Resources(auth = AuthTypeEnum.AUTH)
@@ -80,5 +114,98 @@ public class MarketRecommendController extends SuperController {
         recommendCustomer.setCurrentOpenid(openId);
         recommendCustomerService.save(recommendCustomer);
         return success();
+    }
+
+    @Resources(auth = AuthTypeEnum.AUTH)
+    @ApiOperation("验证分享返礼领取权限接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderId", value = "父类订单ID", required = true, paramType = "path"),
+            @ApiImplicitParam(name = "recommendId", value = "分享返礼ID", required = true, paramType = "path")
+    })
+    @GetMapping(value="/recommend/check/{orderId}/{recommendId}")
+    public JSONObject check(@PathVariable("orderId") Integer orderId, @PathVariable("recommendId") Integer recommendId) {
+        JSONObject resultObj = new JSONObject();
+        String openId = JWTUtils.getOpenId(getToken());
+        Integer customerCount = customerService.query().eq(Customer::getOpenId,openId).count();
+        Order order = orderService.getById(orderId);
+        /*判断该订单下线是否已经达到上限*/
+        int count = marketRecommendService.countPayNum(orderId,recommendId);
+        MarketRecommend marketRecommend = marketRecommendService.query().eq(MarketRecommend::getId,recommendId).entity(e->e);
+        if(count >= marketRecommend.getPeopleNum()){
+            resultObj.put("status",RecommendStatusEnum.NO_MEMBER.value());
+            resultObj.put("msg",RecommendStatusEnum.NO_MEMBER.msg());
+            return resultObj;
+        }
+        if(customerCount == 0){
+            /*新用户*/
+            Customer customer = new Customer();
+            customer.setOpenId(openId);
+            customer.setMId(memberService.query().eq(Member::getLevel,0).getOne().getId());
+            customer.setMemberNum(CustomerUtils.getCustomerNum());
+            customer.setParentId(order.getCustomerId());
+            customerService.save(customer);
+            resultObj.put("status",RecommendStatusEnum.SUCCESS.value());
+            resultObj.put("msg",RecommendStatusEnum.SUCCESS.msg());
+            return resultObj;
+        }else{
+            /*用户存在*/
+            Customer currentCustomer = customerService.query().eq(Customer::getOpenId,openId).entity(e->e);
+            Customer orderCustomer = customerService.query().eq(Customer::getId,order.getCustomerId()).entity(e->e);
+            if(orderCustomer.getParentId().equals(currentCustomer.getId())){
+                /*若领取人是分享人的上级用户*/
+                resultObj.put("status",RecommendStatusEnum.SHARE_ERROR.value());
+                resultObj.put("msg",RecommendStatusEnum.SHARE_ERROR.msg());
+                return resultObj;
+            }
+            if(currentCustomer.equals(orderCustomer)){
+                /*自己分享自己领*/
+                resultObj.put("status",RecommendStatusEnum.SHARE_SELF_ERROR.value());
+                resultObj.put("msg",RecommendStatusEnum.SHARE_SELF_ERROR.msg());
+                return resultObj;
+            }else{
+                if(currentCustomer.getParentId() == null){
+                    /*当前用户未绑定父级用户*/
+                    currentCustomer.setParentId(order.getCustomerId());
+                    customerService.updateById(currentCustomer);
+                    resultObj.put("status",RecommendStatusEnum.SUCCESS.value());
+                    resultObj.put("msg",RecommendStatusEnum.SUCCESS.msg());
+                    return resultObj;
+                }else {
+                    if(currentCustomer.getParentId().equals(orderCustomer.getId())){
+                        /*当前用户绑定父级用户为对应分享人，查询该用户是否领取过商品*/
+                        List<RecommendCustomer> recommendCustomerList = recommendCustomerService.query()
+                                .eq(RecommendCustomer::getCurrentOpenid,openId)
+                                .eq(RecommendCustomer::getRecommendId,recommendId)
+                                .list();
+                        for(RecommendCustomer recommendCustomer : recommendCustomerList){
+                            /*查询是否有购买记录*/
+                            Integer payCount = orderService.query()
+                                    .eq(Order::getId,recommendCustomer.getCurOrderId())
+                                    .eq(Order::getStatus, OrderStatusEnum.PAY_UP.value())
+                                    .count();
+                            if(payCount>0){
+                                /*若有已购买记录*/
+                                resultObj.put("status",RecommendStatusEnum.ACTIVE_EXIST.value());
+                                resultObj.put("msg",RecommendStatusEnum.ACTIVE_EXIST.msg());
+                                return resultObj;
+                            }else{
+                                /*无已购买记录*/
+                                resultObj.put("status",RecommendStatusEnum.SUCCESS.value());
+                                resultObj.put("msg",RecommendStatusEnum.SUCCESS.msg());
+                                return resultObj;
+                            }
+                        }
+                        resultObj.put("status",RecommendStatusEnum.SUCCESS.value());
+                        resultObj.put("msg",RecommendStatusEnum.SUCCESS.msg());
+                        return resultObj;
+                    }else{
+                        /*当前用户绑定父级用户不为对应分享人*/
+                        resultObj.put("status",RecommendStatusEnum.PARENT_ERROR.value());
+                        resultObj.put("msg",RecommendStatusEnum.PARENT_ERROR.msg());
+                        return resultObj;
+                    }
+                }
+            }
+        }
     }
 }

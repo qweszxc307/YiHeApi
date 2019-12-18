@@ -11,6 +11,7 @@ import org.crown.common.utils.HttpUtils;
 import org.crown.common.utils.JWTUtils;
 import org.crown.common.utils.QiNiuUtils;
 import org.crown.enums.AuthTypeEnum;
+import org.crown.enums.StatusEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
@@ -196,12 +197,13 @@ public class AccountController extends SuperController {
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation("设置默认收件地址")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "收件地址id", required = true, paramType = "path")
+            @ApiImplicitParam(name = "id", value = "收件地址id", required = true, paramType = "path"),
+            @ApiImplicitParam(name = "status", value = "状态", required = true, paramType = "body")
     })
     @PutMapping(value = "/express/address/status/{id}")
-    public ApiResponses<Void> status(@PathVariable("id") Integer id,@RequestBody @Validated(AcceptAddressPARM.Status.class) AcceptAddressPARM acceptAddressPARM) {
+    public ApiResponses<Void> status(@PathVariable("id") Integer id,@RequestBody @Validated StatusEnum status ) {
         AcceptAddress acceptAddress = acceptAddressService.getById(id);
-        acceptAddress.setStatus(acceptAddressPARM.getStatus());
+        acceptAddress.setStatus(status);
         acceptAddressService.updateById(acceptAddress);
         return success();
     }

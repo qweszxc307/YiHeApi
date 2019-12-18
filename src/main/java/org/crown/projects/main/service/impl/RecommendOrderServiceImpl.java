@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  * @author whZhang
  */
 @Service
-        public class RecommendOrderServiceImpl extends BaseServiceImpl<RecommendOrderMapper, RecommendOrder>implements IRecommendOrderService {
+public class RecommendOrderServiceImpl extends BaseServiceImpl<RecommendOrderMapper, RecommendOrder>implements IRecommendOrderService {
 
-        }
+}

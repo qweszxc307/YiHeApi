@@ -37,7 +37,9 @@ import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.classify.service.IProductPriceService;
 import org.crown.projects.classify.service.IProductService;
 import org.crown.projects.main.model.entity.RecommendCustomer;
+import org.crown.projects.main.model.entity.RecommendOrder;
 import org.crown.projects.main.service.IRecommendCustomerService;
+import org.crown.projects.main.service.IRecommendOrderService;
 import org.crown.projects.mine.model.dto.AcceptAddressDTO;
 import org.crown.projects.mine.model.entity.Coupon;
 import org.crown.projects.mine.model.entity.CouponCustomer;
@@ -79,6 +81,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     private IProductService productService;
     @Autowired
     private IRecommendCustomerService recommendCustomerService;
+    @Autowired
+    private IRecommendOrderService recommendOrderService;
 
     /**
      * @param num       购买的商品数量
@@ -194,6 +198,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
 
         //保存订单
         save(order);
+        //若是分享返礼产品订单，则添加与分享订单的关联关系
+        if(order.getOrderType().equals(OrderStatusEnum.RECOMMEND_ORDER.value()) ){
+            RecommendOrder recommendOrder = new RecommendOrder();
+            recommendOrder.setOrderId(order.getId());
+            recommendOrder.setRecommendId(orderPARM.getRecommendId());
+            recommendOrderService.save(recommendOrder);
+        }
         //若是分享返礼领取订单，则添加与分享订单的关联关系
          if(order.getOrderType().equals(OrderStatusEnum.RECOMMEND_SEND_ORDER.value()) ){
             RecommendCustomer recommendCustomer = new RecommendCustomer();

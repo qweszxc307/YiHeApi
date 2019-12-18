@@ -84,6 +84,7 @@ public class ProductRestController extends SuperController {
                         .eq(Product::getStatus,0)
                         .eq(Product::getBrandId,brandId)
                         .notInSql(Product::getId, "select send_pid from market_recommend")
+                        .notInSql(Product::getId, "select active_pid from market_recommend")
                         .entitys(
                                 e -> {
                                         ProductDTO productDTO = e.convert(ProductDTO.class);
