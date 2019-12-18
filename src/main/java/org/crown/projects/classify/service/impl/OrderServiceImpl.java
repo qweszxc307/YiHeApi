@@ -28,10 +28,7 @@ import org.crown.framework.service.impl.BaseServiceImpl;
 import org.crown.projects.classify.mapper.OrderMapper;
 import org.crown.projects.classify.model.dto.OrderDTO;
 import org.crown.projects.classify.model.dto.ProductDTO;
-import org.crown.projects.classify.model.entity.Order;
-import org.crown.projects.classify.model.entity.OrderLogistics;
-import org.crown.projects.classify.model.entity.PostFee;
-import org.crown.projects.classify.model.entity.ProductPrice;
+import org.crown.projects.classify.model.entity.*;
 import org.crown.projects.classify.service.IOrderLogisticsService;
 import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.classify.service.IProductPriceService;
@@ -126,6 +123,22 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         BigDecimal price = orderPARM.getPrice();
         Integer couponId = orderPARM.getCouponId();
         ProductDTO product = orderPARM.getProduct();
+        Product productEntity = productService.getById(product.getId());
+        if (productEntity== null) {
+            log.error("传入的商品信息不正确：" + product.getId());
+            return null;
+        }
+        if (productEntity.getStock() <= 0) {
+            log.error("商品库存为空" + productEntity.toString());
+            return null;
+        }
+        if ((productEntity.getStock() - product.getNum()) <= 0) {
+            log.error("【购买的数量大于库存】：{ 商品的库存为：" + productEntity.getStock() + "购买的数量为：" + product.getNum() + " }");
+            return null;
+        }
+        productEntity.setStock(productEntity.getStock() - product.getNum());
+        productService.updateById(productEntity);
+
         //创建订单
         Order order = new Order();
         if (orderPARM.getOrderType() != 1&&orderPARM.getOrderType() != 2) {
@@ -249,6 +262,10 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             coupon.setUsed(coupon.getUsed() - 1);
             couponService.updateById(coupon);
         }
+        Product product = productService.getById(order.getProductId());
+        product.setStock(product.getStock() + order.getNum());
+        productService.updateById(product);
+
         OrderLogistics entity = orderLogisticsService.query().eq(OrderLogistics::getOrderId, orderId).entity(e -> e);
         orderLogisticsService.removeById(entity);
         removeById(orderId);

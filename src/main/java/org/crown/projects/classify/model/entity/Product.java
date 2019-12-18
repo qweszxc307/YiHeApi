@@ -21,13 +21,13 @@
 package org.crown.projects.classify.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import org.crown.framework.model.BaseModel;
-import java.time.LocalDateTime;
-
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.crown.framework.model.BaseModel;
+
+import java.time.LocalDateTime;
 
 
 /**
@@ -43,25 +43,27 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class Product extends BaseModel {
 
-private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(notes = "产品名称")
-private String name;
+    private String name;
     @ApiModelProperty(notes = "品牌id")
-private String brandId;
+    private String brandId;
     @ApiModelProperty(notes = "模板id")
-private String modelId;
+    private String modelId;
     @ApiModelProperty(notes = "状态")
-private Integer status;
+    private Integer status;
     @ApiModelProperty(notes = "排序")
-private Integer orderNum;
+    private Integer orderNum;
     @ApiModelProperty(notes = "创建时间")
-private LocalDateTime createTime;
+    private LocalDateTime createTime;
     @ApiModelProperty(notes = "创建人ID")
-private Integer createUid;
+    private Integer createUid;
     @ApiModelProperty(notes = "修改时间")
-private LocalDateTime updateTime;
+    private LocalDateTime updateTime;
     @ApiModelProperty(notes = "修改人id")
-private Integer updateUid;
+    private Integer updateUid;
+    @ApiModelProperty(notes = "库存")
+    private Integer stock;
 
 }

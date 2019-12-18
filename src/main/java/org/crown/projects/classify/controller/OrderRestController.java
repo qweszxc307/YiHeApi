@@ -94,7 +94,7 @@ public class OrderRestController extends SuperController {
         String openId = JWTUtils.getOpenId(getToken());
         Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
         OrderDTO order = orderService.createOrder(customer, orderPARM);
-        if (null == order) {
+        if (order == null) {
             return success(HttpStatus.GATEWAY_TIMEOUT, null);
         }
         return success(order);
