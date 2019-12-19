@@ -93,7 +93,6 @@ public class OrderRestController extends SuperController {
     public ApiResponses<OrderDTO> createOrder(@RequestBody OrderPARM orderPARM) {
         String openId = JWTUtils.getOpenId(getToken());
         Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
-         orderService.createOrder(response,customer, orderPARM);
         return orderService.createOrder(response,customer, orderPARM);
     }
 

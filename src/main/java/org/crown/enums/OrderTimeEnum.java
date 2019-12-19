@@ -3,13 +3,13 @@ package org.crown.enums;
 /**
  * @author ykMa
  */
-public enum OrderEnum {
+public enum OrderTimeEnum {
     CLOSE_TIME(30L, "支付关闭时间");
 
     private Long value;
     private String msg;
 
-    OrderEnum(Long value, String msg) {
+    OrderTimeEnum(Long value, String msg) {
         this.value = value;
         this.msg = msg;
     }
