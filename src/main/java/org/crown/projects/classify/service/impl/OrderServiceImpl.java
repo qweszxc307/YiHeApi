@@ -125,7 +125,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     @Transactional(readOnly = false)
     @Override
     public ApiResponses<OrderDTO> createOrder(HttpServletResponse response,Customer customer, OrderPARM orderPARM) {
-        ResultResponse<OrderDTO> resultResponse ;
         AcceptAddressDTO address = orderPARM.getAddress();
         BigDecimal postFee = orderPARM.getPostFee();
         BigDecimal price = orderPARM.getPrice();
@@ -134,8 +133,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         Product productEntity = productService.getById(product.getId());
         if (productEntity== null) {
             log.error("传入的商品信息不正确：" + product.getId());
-         /*   resultResponse = new ResultResponse<OrderDTO>(ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "传入的商品信息不正确", null);
-           *//* return resultResponse;*/
             return success(response,ExceptionEnum.ORDER_NOT_FOUND.getStatus(),"传入的商品信息不正确", null);
         }
         if (productEntity.getStock() <= 0) {
