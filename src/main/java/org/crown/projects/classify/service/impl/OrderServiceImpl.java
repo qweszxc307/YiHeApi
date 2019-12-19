@@ -23,10 +23,11 @@ package org.crown.projects.classify.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.crown.common.utils.CustomerUtils;
 import org.crown.enums.CouponTypeEnum;
+import org.crown.enums.OrderStatusEnum;
 import org.crown.enums.ExceptionEnum;
 import org.crown.enums.OrderTimeEnum;
-import org.crown.enums.OrderStatusEnum;
 import org.crown.framework.responses.ApiResponses;
+import org.crown.framework.responses.ResultResponse;
 import org.crown.framework.service.impl.BaseServiceImpl;
 import org.crown.projects.classify.mapper.OrderMapper;
 import org.crown.projects.classify.model.dto.OrderDTO;
@@ -125,6 +126,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
     @Transactional(readOnly = false)
     @Override
     public ApiResponses<OrderDTO> createOrder(HttpServletResponse response, Customer customer, OrderPARM orderPARM) {
+        ResultResponse<OrderDTO> resultResponse;
         AcceptAddressDTO address = orderPARM.getAddress();
         BigDecimal postFee = orderPARM.getPostFee();
         BigDecimal price = orderPARM.getPrice();
@@ -133,15 +135,19 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         Product productEntity = productService.getById(product.getId());
         if (productEntity == null) {
             log.error("传入的商品信息不正确：" + product.getId());
+            /*   resultResponse = new ResultResponse<OrderDTO>(ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "传入的商品信息不正确", null);
+             *//* return resultResponse;*/
             return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "传入的商品信息不正确", null);
         }
-        if (productEntity.getStock() < product.getNum() && productEntity.getStock() <= 0) {
+        if (productEntity.getStock() <= 0) {
             log.error("商品库存为空");
             return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "商品库存为空", null);
+
         }
         if ((productEntity.getStock() - product.getNum()) < 0) {
             log.error("【购买的数量大于库存】：{ 商品的库存为：" + productEntity.getStock() + "购买的数量为：" + product.getNum() + " }");
             return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "购买的数量大于库存", null);
+
         }
         productEntity.setStock(productEntity.getStock() - product.getNum());
         productService.updateById(productEntity);
@@ -149,31 +155,33 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         //创建订单
         Order order = new Order();
         if (!orderPARM.getOrderType().equals(OrderStatusEnum.RECOMMEND_ORDER.value()) && !orderPARM.getOrderType().equals(OrderStatusEnum.RECOMMEND_SEND_ORDER.value())) {
-            BigDecimal postFee1 = queryPostFee(product.getNum(), address.getId(), product.getId(), product.getPrice());
+            BigDecimal postFee1 = queryPostFee(product.getNum(), address.getId(), product.getId(), product.getPrice().multiply(new BigDecimal(product.getNum() + "")));
             if (postFee.compareTo(postFee1) != 0) {
                 log.error("邮费不正确：【传入邮费：" + postFee + ",运算出的邮费：" + postFee1 + " 】");
                 return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "邮费不正确", null);
-            }
 
+            }
             ProductPrice productPrice = productPriceService.query().eq(ProductPrice::getPid, product.getId()).ge(ProductPrice::getENum, product.getNum()).le(ProductPrice::getSNum, product.getNum()).entity(e -> e);
             if (productPrice.getPrice().compareTo(product.getPrice()) != 0) {
                 log.error("商品价格不正确:【传入价格：" + product.getPrice() + ",运算出的价格：" + productPrice.getPrice() + " 】");
                 return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "商品价格不正确", null);
-            }
 
-            BigDecimal add = productPrice.getPrice().multiply(new BigDecimal(product.getNum() + "")).add(postFee1);
+            }
+            BigDecimal add = productPrice.getPrice().multiply(new BigDecimal(product.getNum() + ""));
+
             //设置优惠券id
             if (Objects.nonNull(couponId)) {
                 Coupon coupon = couponService.getById(couponId);
                 if (!coupon.getType().equals(CouponTypeEnum.DISCOUNT.value())) {
-                    add = add.subtract(coupon.getDiscount());
+                    add = add.subtract(coupon.getDiscount()).add(postFee1);
                 } else {
-                    add = add.multiply(coupon.getDiscount());
+                    add = add.multiply(coupon.getDiscount()).add(postFee1);
                 }
                 //设置订单优惠券
                 if (price.compareTo(add) != 0) {
                     log.error("商品的总价格不正确：【传入价格：" + price + "，运算出的价格：" + add + " 】");
                     return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "商品价格不正确", null);
+
                 }
                 order.setCouponId(couponId);
                 List<CouponCustomer> list = couponCustomerService.query().eq(CouponCustomer::getCouponId, couponId).eq(CouponCustomer::getOpenId, customer.getOpenId()).list();
@@ -187,6 +195,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             if (price.compareTo(add) != 0) {
                 log.error("商品的总价格不正确：【传入价格：" + price + "，运算出的价格：" + add + " 】");
                 return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "商品的总价格不正确", null);
+
             }
         }
 
@@ -216,6 +225,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         order.setCloseTime(LocalDateTime.now().plusMinutes(OrderTimeEnum.CLOSE_TIME.value()));
         //设置邮费
         order.setPostFee(postFee);
+
         //保存订单
         save(order);
         //若是分享返礼产品订单，则添加与分享订单的关联关系
