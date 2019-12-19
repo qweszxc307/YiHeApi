@@ -20,14 +20,13 @@
  */
 package org.crown.framework.responses;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.crown.framework.model.ErrorCode;
 import org.crown.framework.utils.ResponseUtils;
 import org.springframework.http.HttpStatus;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * GET: 200 OK
@@ -73,6 +72,18 @@ public class ApiResponses<T> implements Serializable {
     public static <T> ApiResponses<T> success(HttpServletResponse response, HttpStatus status, T object) {
         response.setStatus(status.value());
         return SuccessResponses.<T>builder().status(status.value()).result(object).build();
+
+    }
+
+    /**
+     * 成功返回
+     *
+     * @param status
+     * @param object
+     */
+    public static <T> ApiResponses<T> success(HttpServletResponse response, Integer status, String msg,T object) {
+        response.setStatus(status);
+        return ResultResponse.<T>builder().status(status).msg(msg).result(object).build();
 
     }
 

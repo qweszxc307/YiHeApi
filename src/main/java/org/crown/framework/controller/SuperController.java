@@ -91,6 +91,17 @@ public class SuperController {
         return ApiResponses.<T>success(response, status, object);
     }
 
+    /**
+     * 成功返回
+     *
+     * @param status
+     * @param object
+     * @return
+     */
+    public <T> ApiResponses<T> success(Integer status, String msg, T object) {
+        return ApiResponses.<T>success(response, status,msg, object);
+    }
+
 
     /**
      * 成功返回

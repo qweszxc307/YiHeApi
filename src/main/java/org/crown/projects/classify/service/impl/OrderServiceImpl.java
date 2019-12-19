@@ -21,9 +21,12 @@
 package org.crown.projects.classify.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.crown.enums.OrderEnum;
 import org.crown.common.utils.CustomerUtils;
+import org.crown.enums.OrderEnum;
+import org.crown.enums.ExceptionEnum;
 import org.crown.enums.OrderStatusEnum;
+import org.crown.framework.responses.ApiResponses;
+import org.crown.framework.responses.ResultResponse;
 import org.crown.framework.service.impl.BaseServiceImpl;
 import org.crown.projects.classify.mapper.OrderMapper;
 import org.crown.projects.classify.model.dto.OrderDTO;
@@ -46,13 +49,17 @@ import org.crown.projects.mine.service.IAcceptAddressService;
 import org.crown.projects.mine.service.ICouponCustomerService;
 import org.crown.projects.mine.service.ICouponService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+
+import static org.crown.framework.responses.ApiResponses.success;
 
 /**
  * <p>
@@ -117,7 +124,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
 
     @Transactional(readOnly = false)
     @Override
-    public OrderDTO createOrder(Customer customer, OrderPARM orderPARM) {
+    public ApiResponses<OrderDTO> createOrder(HttpServletResponse response,Customer customer, OrderPARM orderPARM) {
+        ResultResponse<OrderDTO> resultResponse ;
         AcceptAddressDTO address = orderPARM.getAddress();
         BigDecimal postFee = orderPARM.getPostFee();
         BigDecimal price = orderPARM.getPrice();
@@ -126,15 +134,19 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         Product productEntity = productService.getById(product.getId());
         if (productEntity== null) {
             log.error("传入的商品信息不正确：" + product.getId());
-            return null;
+         /*   resultResponse = new ResultResponse<OrderDTO>(ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "传入的商品信息不正确", null);
+           *//* return resultResponse;*/
+            return success(response,ExceptionEnum.ORDER_NOT_FOUND.getStatus(),"传入的商品信息不正确", null);
         }
         if (productEntity.getStock() <= 0) {
-            log.error("商品库存为空" + productEntity.toString());
-            return null;
+            log.error("商品库存为空");
+            return success(response,ExceptionEnum.ORDER_NOT_FOUND.getStatus(),"商品库存为空", null);
+
         }
-        if ((productEntity.getStock() - product.getNum()) <= 0) {
+        if ((productEntity.getStock() - product.getNum()) < 0) {
             log.error("【购买的数量大于库存】：{ 商品的库存为：" + productEntity.getStock() + "购买的数量为：" + product.getNum() + " }");
-            return null;
+            return success(response,ExceptionEnum.ORDER_NOT_FOUND.getStatus(),"购买的数量大于库存", null);
+
         }
         productEntity.setStock(productEntity.getStock() - product.getNum());
         productService.updateById(productEntity);
@@ -142,15 +154,17 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         //创建订单
         Order order = new Order();
         if (orderPARM.getOrderType() != 1&&orderPARM.getOrderType() != 2) {
-            BigDecimal postFee1 = queryPostFee(product.getNum(), address.getId(), product.getId(), price);
+            BigDecimal postFee1 = queryPostFee(product.getNum(), address.getId(), product.getId(), product.getPrice());
             if (postFee.compareTo(postFee1) != 0) {
                 log.error("邮费不正确：【传入邮费：" + postFee + ",运算出的邮费：" + postFee1 + " 】");
-                return null;
+                return success(response,ExceptionEnum.ORDER_NOT_FOUND.getStatus(),"邮费不正确", null);
+
             }
             ProductPrice productPrice = productPriceService.query().eq(ProductPrice::getPid, product.getId()).ge(ProductPrice::getENum, product.getNum()).le(ProductPrice::getSNum, product.getNum()).entity(e -> e);
             if (productPrice.getPrice().compareTo(product.getPrice()) != 0) {
                 log.error("商品价格不正确:【传入价格：" + product.getPrice() + ",运算出的价格：" + productPrice.getPrice() + " 】");
-                return null;
+                return success(response,ExceptionEnum.ORDER_NOT_FOUND.getStatus(),"商品价格不正确", null);
+
             }
             BigDecimal add = productPrice.getPrice().multiply(new BigDecimal(product.getNum() + "")).add(postFee1);
 
@@ -165,7 +179,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
                 //设置订单优惠券
                 if (price.compareTo(add) != 0) {
                     log.error("商品的总价格不正确：【传入价格：" + price + "，运算出的价格：" + add + " 】");
-                    return null;
+                    return success(response,ExceptionEnum.ORDER_NOT_FOUND.getStatus(),"商品价格不正确", null);
+
                 }
                 order.setCouponId(couponId);
                 List<CouponCustomer> list = couponCustomerService.query().eq(CouponCustomer::getCouponId, couponId).eq(CouponCustomer::getOpenId, customer.getOpenId()).list();
@@ -178,7 +193,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             }
             if (price.compareTo(add) != 0) {
                 log.error("商品的总价格不正确：【传入价格：" + price + "，运算出的价格：" + add + " 】");
-                return null;
+                return success(response,ExceptionEnum.ORDER_NOT_FOUND.getStatus(),"商品的总价格不正确", null);
+
             }
         }
 
@@ -240,7 +256,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         orderLogistics.setStreet(address.getStreet());
         //保存订单地址信息
         orderLogisticsService.save(orderLogistics);
-        return order.convert(OrderDTO.class);
+        return success(response,HttpStatus.OK.value(), "成功", order.convert(OrderDTO.class));
     }
 
     /**

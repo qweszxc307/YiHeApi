@@ -93,11 +93,8 @@ public class OrderRestController extends SuperController {
     public ApiResponses<OrderDTO> createOrder(@RequestBody OrderPARM orderPARM) {
         String openId = JWTUtils.getOpenId(getToken());
         Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
-        OrderDTO order = orderService.createOrder(customer, orderPARM);
-        if (order == null) {
-            return success(HttpStatus.GATEWAY_TIMEOUT, null);
-        }
-        return success(order);
+         orderService.createOrder(response,customer, orderPARM);
+        return orderService.createOrder(response,customer, orderPARM);
     }
 
     @Resources(auth = AuthTypeEnum.AUTH)
@@ -118,15 +115,15 @@ public class OrderRestController extends SuperController {
                     .orderByDesc(Order::getCreateTime)
                     .entitys(e -> {
                         OrderDTO orderDTO = e.convert(OrderDTO.class);
-                        if(orderDTO.getOrderType().equals(OrderStatusEnum.RECOMMEND_ORDER.value())){
+                        if (orderDTO.getOrderType().equals(OrderStatusEnum.RECOMMEND_ORDER.value())) {
                             /*推荐返礼产品订单-添加推荐返礼关联关系*/
-                            RecommendOrder recommendOrder = recommendOrderService.query().eq(RecommendOrder::getOrderId,orderDTO.getId()).entity(f->f);
+                            RecommendOrder recommendOrder = recommendOrderService.query().eq(RecommendOrder::getOrderId, orderDTO.getId()).entity(f -> f);
                             orderDTO.setRecommendId(recommendOrder.getRecommendId());
                         }
                         return orderDTO;
                     });
             if (entitys.size() > 0) {
-                entitys.forEach(e->{
+                entitys.forEach(e -> {
                     if (e.getStatus().equals(OrderStatusEnum.INIT.value()) && e.getCloseTime().isAfter(LocalDateTime.now())) {
                         orders.add(e);
                     }
@@ -140,7 +137,6 @@ public class OrderRestController extends SuperController {
             return success(HttpStatus.REQUEST_TIMEOUT, null);
         }
     }
-
 
 
     @Resources(auth = AuthTypeEnum.AUTH)

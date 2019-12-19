@@ -20,12 +20,14 @@
  */
 package org.crown.projects.classify.service;
 
+import org.crown.framework.responses.ApiResponses;
 import org.crown.framework.service.BaseService;
 import org.crown.projects.classify.model.dto.OrderDTO;
 import org.crown.projects.classify.model.entity.Order;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.model.parm.OrderPARM;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 
 /**
@@ -52,8 +54,7 @@ public interface IOrderService extends BaseService<Order> {
      * @param orderPARM 订单信息
      * @return 订单
      */
-
-    OrderDTO createOrder(Customer customer, OrderPARM orderPARM);
+    ApiResponses<OrderDTO> createOrder(HttpServletResponse response, Customer customer, OrderPARM orderPARM);
     /**
      * 取消订单
      * @param orderId 订单id
