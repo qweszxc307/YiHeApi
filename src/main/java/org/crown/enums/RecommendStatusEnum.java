@@ -8,15 +8,15 @@ public enum RecommendStatusEnum {
 
     SHARE_SELF_ERROR(201, "领取人不可为自己，请分享给他人领取"),
 
-    NO_STOCK(202, "无库存"),
+    NO_STOCK(201, "无库存"),
 
-    PARENT_ERROR(203, "您只能领取上级用户的分享"),
+    PARENT_ERROR(201, "您只能领取上级用户的分享"),
 
-    ACTIVE_EXIST(204, "您已领取过该商品，请勿重复领取"),
+    ACTIVE_EXIST(201, "您已领取过该商品，请勿重复领取"),
 
-    NO_MEMBER(205, "该单领取名额已达上限"),
+    NO_MEMBER(201, "该单领取名额已达上限"),
 
-    SHARE_ERROR(206, "您已是此用户的上级用户,不可参与该分享")
+    SHARE_ERROR(201, "您已是此用户的上级用户,不可参与该分享")
     ;
 
     private Integer value;

@@ -8,6 +8,7 @@ import java.io.Serializable;
 @ToString
 @Builder
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
 @NoArgsConstructor
 public class ResultResponse<T>  extends ApiResponses<T> implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -17,10 +18,4 @@ public class ResultResponse<T>  extends ApiResponses<T> implements Serializable 
     private  String msg;
 
     private Object result;
-
-    public ResultResponse(Integer status, String msg,Object result) {
-        this.status =  status;
-        this.msg =  msg;
-        this.result =  result;
-    }
 }

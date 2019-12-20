@@ -123,7 +123,7 @@ public class MarketRecommendController extends SuperController {
             @ApiImplicitParam(name = "recommendId", value = "分享返礼ID", required = true, paramType = "path")
     })
     @GetMapping(value="/recommend/check/{orderId}/{recommendId}")
-    public ApiResponses<Void> check(@PathVariable("orderId") Integer orderId, @PathVariable("recommendId") Integer recommendId) {
+    public ApiResponses<Object> check(@PathVariable("orderId") Integer orderId, @PathVariable("recommendId") Integer recommendId) {
         String openId = JWTUtils.getOpenId(getToken());
         Integer customerCount = customerService.query().eq(Customer::getOpenId,openId).count();
         Order order = orderService.getById(orderId);
@@ -152,8 +152,7 @@ public class MarketRecommendController extends SuperController {
             }
             if(currentCustomer.equals(orderCustomer)){
                 /*自己分享自己领*/
-                //return success(RecommendStatusEnum.SHARE_SELF_ERROR.value(),RecommendStatusEnum.SHARE_SELF_ERROR.msg(),null);
-                return success(RecommendStatusEnum.SUCCESS.value(),RecommendStatusEnum.SUCCESS.msg(),null);
+                return success(RecommendStatusEnum.SHARE_SELF_ERROR.value(),RecommendStatusEnum.SHARE_SELF_ERROR.msg(),null);
             }else{
                 if(currentCustomer.getParentId() == null){
                     /*当前用户未绑定父级用户*/
