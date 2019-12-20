@@ -150,6 +150,7 @@ public class MarketRecommendController extends SuperController {
                 /*若领取人是分享人的上级用户*/
                 return success(RecommendStatusEnum.SHARE_ERROR.value(),RecommendStatusEnum.SHARE_ERROR.msg(),null);
             }
+
             if(currentCustomer.equals(orderCustomer)){
                 /*自己分享自己领*/
                 return success(RecommendStatusEnum.SHARE_SELF_ERROR.value(),RecommendStatusEnum.SHARE_SELF_ERROR.msg(),null);
