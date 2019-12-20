@@ -23,11 +23,10 @@ package org.crown.projects.classify.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.crown.common.utils.CustomerUtils;
 import org.crown.enums.CouponTypeEnum;
-import org.crown.enums.OrderStatusEnum;
 import org.crown.enums.ExceptionEnum;
+import org.crown.enums.OrderStatusEnum;
 import org.crown.enums.OrderTimeEnum;
 import org.crown.framework.responses.ApiResponses;
-import org.crown.framework.responses.ResultResponse;
 import org.crown.framework.service.impl.BaseServiceImpl;
 import org.crown.projects.classify.mapper.OrderMapper;
 import org.crown.projects.classify.model.dto.OrderDTO;
@@ -189,7 +188,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
                 coupon.setUsed(coupon.getUsed() + 1);
                 couponService.updateById(coupon);
             }
-            if (price.compareTo(add) != 0) {
+            if (price.compareTo(add.add(postFee1)) != 0) {
                 log.error("商品的总价格不正确：【传入价格：" + price + "，运算出的价格：" + add + " 】");
                 return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "商品的总价格不正确", null);
 
