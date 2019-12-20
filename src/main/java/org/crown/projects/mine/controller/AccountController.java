@@ -94,11 +94,9 @@ public class AccountController extends SuperController {
             customer.setOpenId(openId);
             customer.setMId(memberService.query().eq(Member::getLevel,0).getOne().getId());
             customer.setMemberNum(CustomerUtils.getCustomerNum());
-            customerService.save(customer);
-        }else{
             customer.setNickName(loginPARM.getNickName());
             customer.setHeadImg(loginPARM.getHeadImg());
-            customerService.saveOrUpdate(customer);
+            customerService.save(customer);
         }
         CustomerDTO customerDTO = customerService.query().eq(Customer::getOpenId,openId).entity(
                 e->{
