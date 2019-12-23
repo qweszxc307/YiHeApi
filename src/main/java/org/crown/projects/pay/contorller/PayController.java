@@ -10,6 +10,7 @@ import org.crown.common.utils.JWTUtils;
 import org.crown.common.utils.WxUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.enums.OrderStatusEnum;
+import org.crown.enums.PayTypeEnum;
 import org.crown.enums.WxApiEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
@@ -17,6 +18,7 @@ import org.crown.projects.classify.model.entity.Order;
 import org.crown.projects.classify.service.IOrderService;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.service.ICustomerService;
+import org.crown.projects.pay.service.IPayRecordService;
 import org.crown.projects.pay.utlis.PayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,6 +45,8 @@ public class PayController extends SuperController {
 
     @Autowired
     private IOrderService orderService;
+    @Autowired
+    private IPayRecordService payRecordService;
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "请求支付接口")
@@ -57,7 +61,7 @@ public class PayController extends SuperController {
             String openId = JWTUtils.getOpenId(getToken());
             Order order = orderService.getById(orderId);
             order.setPaymentType(payType);
-            if (payType == 1) {
+            if (payType.equals(PayTypeEnum.YE.value())) {
                 //余额支付 查询用户的余额是否满足订单金额，如果不满足返回异常，如果满足则减少
                 Customer customer = customerService.query().eq(Customer::getOpenId, openId).getOne();
                 if (customer.getBonus().compareTo(order.getTotalFee()) > -1) {
@@ -69,6 +73,7 @@ public class PayController extends SuperController {
                     order.setPayTime(LocalDateTime.now());
                     customerService.updateById(customer);
                     orderService.updateById(order);
+                    payRecordService.create(customer, order.getTotalFee(), PayTypeEnum.CONSUME, PayTypeEnum.NEGATIVE, PayTypeEnum.YE);
                     return success(HttpStatus.OK, null);
                 } else {
                     return success(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE, null);
@@ -172,12 +177,14 @@ public class PayController extends SuperController {
                 if (order.getStatus().equals(OrderStatusEnum.INIT)) {
                     order.setStatus(OrderStatusEnum.PAY_UP.value());
                     order.setPayTime(now);
-                    orderService.updateById(order);
+
                     Customer customer = customerService.getById(order.getCustomerId());
                     customer.setLastTime(now);
                     customer.setSum(customer.getSum().add(order.getTotalFee()));
                     customer.setOrderNum(customer.getOrderNum() + 1);
+                    orderService.updateById(order);
                     customerService.updateById(customer);
+                    payRecordService.create(customer, order.getTotalFee(), PayTypeEnum.CONSUME, PayTypeEnum.NEGATIVE, PayTypeEnum.WX);
                 }
                 //通知微信服务器已经支付成功
                 resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"

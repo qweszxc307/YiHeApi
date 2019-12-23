@@ -10,6 +10,7 @@ import org.crown.common.utils.JWTUtils;
 import org.crown.common.utils.WxUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.enums.OrderStatusEnum;
+import org.crown.enums.PayTypeEnum;
 import org.crown.enums.WxApiEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
@@ -164,7 +165,7 @@ public class RecommendPayController extends SuperController {
             String openId = JWTUtils.getOpenId(getToken());
             Order order = orderService.getById(currentOrderId);
             order.setPaymentType(payType);
-            if (payType == 1) {
+            if (payType.equals(PayTypeEnum.YE.value())) {
                 //余额支付 查询用户的余额是否满足订单金额，如果不满足返回异常，如果满足则减少
                 Customer customer = customerService.query().eq(Customer::getOpenId, openId).getOne();
                 if (customer.getBonus().compareTo(order.getTotalFee()) > -1) {

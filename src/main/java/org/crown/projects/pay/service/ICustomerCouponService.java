@@ -18,18 +18,18 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.pay.service.coupon;
+package org.crown.projects.pay.service;
 
 import org.crown.framework.service.BaseService;
-import org.crown.projects.pay.model.coupon.entity.CustomerCoupon;
+import org.crown.projects.pay.model.entity.CustomerCoupon;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author ykMa
  */
 public interface ICustomerCouponService extends BaseService<CustomerCoupon> {
 
-        }
+}

@@ -12,7 +12,7 @@ import org.crown.projects.main.model.entity.MarketRecommend;
  * @date: 2019/12/12 14:09
  */
 public interface IRecommendPayService extends BaseService<MarketRecommend> {
-     void returnSendMoney(int curOrderId);
+    void returnSendMoney(int curOrderId);
 
     void returnBuyMoney(int curOrderId);
 }

@@ -43,68 +43,68 @@ public class RecommendPayServiceImpl extends BaseServiceImpl<MarketRecommendMapp
     private IRecommendCustomerService recommendCustomerService;
 
     @Override
-    @Transactional(readOnly = false,rollbackFor = Exception.class)
+    @Transactional(readOnly = false, rollbackFor = Exception.class)
     public void returnSendMoney(int curOrderId) {
-        RecommendCustomer recommendCustomer = recommendCustomerService.query().eq(RecommendCustomer::getCurOrderId,curOrderId).entity(e->e);
-        updateBounds(getCustomerByOrderId(recommendCustomer.getOrderId()),getSendReturnMoney(recommendCustomer.getRecommendId()));
+        RecommendCustomer recommendCustomer = recommendCustomerService.query().eq(RecommendCustomer::getCurOrderId, curOrderId).entity(e -> e);
+        updateBounds(getCustomerByOrderId(recommendCustomer.getOrderId()), getSendReturnMoney(recommendCustomer.getRecommendId()));
     }
 
     @Override
-    @Transactional(readOnly = false,rollbackFor = Exception.class)
+    @Transactional(readOnly = false, rollbackFor = Exception.class)
     public void returnBuyMoney(int curOrderId) {
         Order order = orderService.getById(curOrderId);
         Integer activePid = order.getProductId();
-        MarketRecommend marketRecommend = marketRecommendService.query().eq(MarketRecommend::getActivePid,activePid).eq(MarketRecommend::getStatus, StatusEnum.NORMAL).entity(e->e);
+        MarketRecommend marketRecommend = marketRecommendService.query().eq(MarketRecommend::getActivePid, activePid).eq(MarketRecommend::getStatus, StatusEnum.NORMAL).entity(e -> e);
         /*获取当前用户对应分享人*/
         List<Map> recommendCustomerList = baseMapper.queryReturnBuyCustomer(activePid);
-        for(Map map:recommendCustomerList ){
-            updateBounds(getCustomerByOrderId(map.get("open_id").toString()),getBuyReturnMoney(marketRecommend.getId()));
+        for (Map map : recommendCustomerList) {
+            updateBounds(getCustomerByOrderId(map.get("open_id").toString()), getBuyReturnMoney(marketRecommend.getId()));
         }
     }
 
     /**
-     @title : 根据分享返礼信息，获取领取产品返现金额
-     @params : recommendId：分享返礼ID
+     * @title : 根据分享返礼信息，获取领取产品返现金额
+     * @params : recommendId：分享返礼ID
      */
-    public BigDecimal getSendReturnMoney(int recommendId){
-        MarketRecommend marketRecommend =  marketRecommendService.getById(recommendId);
+    public BigDecimal getSendReturnMoney(int recommendId) {
+        MarketRecommend marketRecommend = marketRecommendService.getById(recommendId);
         return marketRecommend.getPayReturnMoney();
     }
 
     /**
-     @title : 根据分享返礼信息，获取购买产品返现金额
-     @params : recommendId：分享返礼ID
+     * @title : 根据分享返礼信息，获取购买产品返现金额
+     * @params : recommendId：分享返礼ID
      */
-    public BigDecimal getBuyReturnMoney(int recommendId){
-        MarketRecommend marketRecommend =  marketRecommendService.getById(recommendId);
+    public BigDecimal getBuyReturnMoney(int recommendId) {
+        MarketRecommend marketRecommend = marketRecommendService.getById(recommendId);
         return marketRecommend.getBuyReturnMoney();
     }
 
     /**
-     @title : 根据订单id获取用户
-     @params : orderId：分享人订单id
+     * @title : 根据订单id获取用户
+     * @params : orderId：分享人订单id
      */
-    public Customer getCustomerByOrderId(int orderId){
+    public Customer getCustomerByOrderId(int orderId) {
         Order order = orderService.getById(orderId);
-        Customer customer = customerService.query().eq(Customer::getId,order.getCustomerId()).entity(e->e);
+        Customer customer = customerService.query().eq(Customer::getId, order.getCustomerId()).entity(e -> e);
         return customer;
     }
 
     /**
-     @title : 根据open_id获取用户
-     @params : openId：openId
+     * @title : 根据open_id获取用户
+     * @params : openId：openId
      */
-    public Customer getCustomerByOrderId(String openId){
-        Customer customer = customerService.query().eq(Customer::getOpenId,openId).entity(e->e);
+    public Customer getCustomerByOrderId(String openId) {
+        Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e -> e);
         return customer;
     }
 
     /**
-     @title : 计算返现额度，并且更新记录
-     @params : orderId：分享返礼ID
+     * @title : 计算返现额度，并且更新记录
+     * @params : orderId：分享返礼ID
      */
-    @Transactional(readOnly = false,rollbackFor = Exception.class)
-    public void updateBounds(Customer customer,BigDecimal addMoney){
+    @Transactional(readOnly = false, rollbackFor = Exception.class)
+    public void updateBounds(Customer customer, BigDecimal addMoney) {
         BigDecimal oldBounds = customer.getBonus();
         BigDecimal newBounds = oldBounds.add(addMoney);
         customer.setBonus(newBounds);

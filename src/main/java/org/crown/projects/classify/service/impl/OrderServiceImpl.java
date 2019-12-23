@@ -145,8 +145,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             return success(response, ExceptionEnum.ORDER_NOT_FOUND.getStatus(), "购买的数量大于库存", null);
 
         }
-        productEntity.setStock(productEntity.getStock() - product.getNum());
-        productService.updateById(productEntity);
+
 
         //创建订单
         Order order = new Order();
@@ -253,6 +252,9 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         orderLogistics.setStreet(address.getStreet());
         //保存订单地址信息
         orderLogisticsService.save(orderLogistics);
+        //修改库存
+        productEntity.setStock(productEntity.getStock() - product.getNum());
+        productService.updateById(productEntity);
         return success(response, HttpStatus.OK.value(), "成功", order.convert(OrderDTO.class));
     }
 
@@ -270,8 +272,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
             CouponCustomer couponCustomer = new CouponCustomer();
             couponCustomer.setCouponId(order.getCouponId());
             couponCustomer.setOpenId(openId);
-            couponCustomerService.save(couponCustomer);
             Coupon coupon = couponService.getById(order.getCouponId());
+            couponCustomerService.save(couponCustomer);
             coupon.setUsed(coupon.getUsed() - 1);
             couponService.updateById(coupon);
         }

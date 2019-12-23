@@ -8,15 +8,19 @@ import org.crown.common.utils.JWTUtils;
 import org.crown.common.utils.WxUtils;
 import org.crown.enums.AuthTypeEnum;
 import org.crown.enums.CustomerCouponEnum;
+import org.crown.enums.PayTypeEnum;
 import org.crown.enums.WxApiEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.mine.model.entity.Coupon;
 import org.crown.projects.mine.model.entity.CouponCustomer;
+import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.service.ICouponCustomerService;
 import org.crown.projects.mine.service.ICouponService;
-import org.crown.projects.pay.model.coupon.entity.CustomerCoupon;
-import org.crown.projects.pay.service.coupon.ICustomerCouponService;
+import org.crown.projects.mine.service.ICustomerService;
+import org.crown.projects.pay.model.entity.CustomerCoupon;
+import org.crown.projects.pay.service.ICustomerCouponService;
+import org.crown.projects.pay.service.IPayRecordService;
 import org.crown.projects.pay.utlis.PayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +53,10 @@ public class CouponPayController extends SuperController {
     private ICouponService couponService;
     @Autowired
     private ICouponCustomerService couponCustomerService;
+    @Autowired
+    private ICustomerService customerService;
+    @Autowired
+    private IPayRecordService payRecordService;
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "优惠券支付接口")
@@ -176,6 +185,11 @@ public class CouponPayController extends SuperController {
                         couponCustomerService.save(couponCustomer);
                         couponService.updateById(e);
                     });
+
+                    Customer customer = customerService.query().eq(Customer::getOpenId, customerCoupon.getOpenId()).entity(e -> e);
+                    customer.setSum(customer.getSum().add(new BigDecimal("1")));
+                    payRecordService.create(customer, new BigDecimal("1"), PayTypeEnum.CONSUME, PayTypeEnum.NEGATIVE, PayTypeEnum.WX);
+
                 }
                 //通知微信服务器已经支付成功
                 resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"

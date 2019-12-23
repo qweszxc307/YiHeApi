@@ -18,40 +18,22 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.crown.projects.pay.model.coupon.entity;
+package org.crown.projects.pay.service.impl;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.crown.framework.model.BaseModel;
-
-import java.time.LocalDateTime;
-
+import org.crown.framework.service.impl.BaseServiceImpl;
+import org.crown.projects.pay.mapper.CustomerCouponMapper;
+import org.crown.projects.pay.model.entity.CustomerCoupon;
+import org.crown.projects.pay.service.ICustomerCouponService;
+import org.springframework.stereotype.Service;
 
 /**
  * <p>
- *
+ * 服务实现类
  * </p>
  *
  * @author ykMa
  */
-@TableName("customer_coupon")
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class CustomerCoupon extends BaseModel {
-
-    private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(notes = "小程序open id")
-    private String openId;
-    @ApiModelProperty(notes = "状态：1：已支付，0未支付")
-    private Integer status;
-    @ApiModelProperty(notes = "更新时间")
-    private LocalDateTime updateTime;
-    @ApiModelProperty(notes = "创建时间")
-    private LocalDateTime createTime;
+@Service
+public class CustomerCouponServiceImpl extends BaseServiceImpl<CustomerCouponMapper, CustomerCoupon> implements ICustomerCouponService {
 
 }
