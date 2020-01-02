@@ -293,6 +293,7 @@ public class RecommendPayController extends SuperController {
                     customer.setOrderNum(customer.getOrderNum() + 1);
                     customerService.updateById(customer);
                 }
+                recommendPayService.returnBuyMoney(orderId);
                 //通知微信服务器已经支付成功
                 resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
                         + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";

@@ -20,6 +20,8 @@
  */
 package org.crown.projects.mine.model.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import org.crown.framework.model.BaseModel;
 
@@ -27,6 +29,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 
 /**
@@ -50,5 +54,8 @@ private String phone;
 private String detail;
     @ApiModelProperty(notes = "对应用户openid")
 private String openid;
+    @ApiModelProperty(notes = "创建时间")
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
 
 }

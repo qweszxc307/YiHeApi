@@ -154,7 +154,7 @@ public class MarketRecommendController extends SuperController {
                 /*自己分享自己领*/
                 return success(RecommendStatusEnum.SHARE_SELF_ERROR.value(),RecommendStatusEnum.SHARE_SELF_ERROR.msg(),null);
             }else{
-                if(currentCustomer.getParentId() == null){
+                if(currentCustomer.getParentId() == 0){
                     /*当前用户未绑定父级用户*/
                     currentCustomer.setParentId(order.getCustomerId());
                     customerService.updateById(currentCustomer);
