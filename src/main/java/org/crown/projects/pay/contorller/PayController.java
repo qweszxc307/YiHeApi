@@ -78,7 +78,7 @@ public class PayController extends SuperController {
                 packageParams.put("mch_id", mchId);
                 packageParams.put("nonce_str", nonce_str);
                 packageParams.put("body", body);
-                packageParams.put("out_trade_no", orderId + "");//商户订单号,自己的订单ID
+                packageParams.put("out_trade_no", order.getOrderNum() + "");//商户订单号,自己的订单ID
                 packageParams.put("total_fee", 1 + "");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
                 packageParams.put("spbill_create_ip", spbill_create_ip);
                 packageParams.put("notify_url", WxApiEnum.WX_PAY_BACK_API.value());//支付成功后的回调地址
