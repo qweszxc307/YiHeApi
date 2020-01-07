@@ -2,25 +2,17 @@ package org.crown.projects.pay.contorller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.log4j.Log4j2;
 import net.sf.json.JSONObject;
 import org.crown.common.annotations.Resources;
 import org.crown.common.utils.JWTUtils;
 import org.crown.common.utils.WxUtils;
 import org.crown.enums.AuthTypeEnum;
-import org.crown.enums.CustomerCouponEnum;
-import org.crown.enums.PayTypeEnum;
 import org.crown.enums.WxApiEnum;
 import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
-import org.crown.projects.mine.model.entity.Coupon;
-import org.crown.projects.mine.model.entity.CouponCustomer;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.service.ICouponCustomerService;
-import org.crown.projects.mine.service.ICouponService;
-import org.crown.projects.mine.service.ICustomerService;
 import org.crown.projects.pay.model.entity.CustomerCoupon;
-import org.crown.projects.pay.service.ICustomerCouponService;
-import org.crown.projects.pay.service.IPayRecordService;
+import org.crown.projects.pay.service.ICouponPayService;
 import org.crown.projects.pay.utlis.PayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,28 +27,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Api(tags = {"支付"}, description = "微信支付")
 @RestController
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
+@Log4j2
 public class CouponPayController extends SuperController {
 
+
     @Autowired
-    private ICustomerCouponService customerCouponService;
-    @Autowired
-    private ICouponService couponService;
-    @Autowired
-    private ICouponCustomerService couponCustomerService;
-    @Autowired
-    private ICustomerService customerService;
-    @Autowired
-    private IPayRecordService payRecordService;
+    private ICouponPayService couponPayService;
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "优惠券支付接口")
@@ -65,17 +48,9 @@ public class CouponPayController extends SuperController {
 
         try {
             String openId = JWTUtils.getOpenId(getToken());
-            Integer count = customerCouponService.query().eq(CustomerCoupon::getOpenId, openId).count();
             CustomerCoupon customerCoupon = new CustomerCoupon();
-            if (count == 0) {
-                customerCoupon.setOpenId(openId);
-                customerCoupon.setCreateTime(LocalDateTime.now());
-                customerCouponService.save(customerCoupon);
-            } else {
-                customerCoupon = customerCouponService.query().eq(CustomerCoupon::getOpenId, openId).entity(e -> e);
-                if (customerCoupon.getStatus().equals(CustomerCouponEnum.PAID.value())) {
-                    return success(HttpStatus.NOT_ACCEPTABLE, null);
-                }
+            if (!couponPayService.callAfter(openId, customerCoupon)) {
+                return success(HttpStatus.NOT_ACCEPTABLE, null);
             }
 
             //生成的随机字符串
@@ -169,28 +144,7 @@ public class CouponPayController extends SuperController {
             if (PayUtil.verify(prestr, (String) map.get("sign"), key, "utf-8")) {
                 /*此处添加自己的业务逻辑代码start*/
                 //注意要判断微信支付重复回调，支付成功后微信会重复的进行回调
-                LocalDateTime now = LocalDateTime.now();
-                int customerCouponId = Integer.parseInt(map.get("out_trade_no").toString());
-                CustomerCoupon customerCoupon = customerCouponService.getById(customerCouponId);
-                if (customerCoupon.getStatus().equals(CustomerCouponEnum.UNPAID.value())) {
-                    customerCoupon.setStatus(CustomerCouponEnum.PAID.value());
-                    customerCouponService.updateById(customerCoupon);
-                    List<Coupon> list = couponService.query().eq(Coupon::getStatus, 0).eq(Coupon::getRule, 5).list();
-                    CouponCustomer couponCustomer = new CouponCustomer();
-                    couponCustomer.setOpenId(customerCoupon.getOpenId());
-                    couponCustomer.setCreateTime(now);
-                    list.forEach(e->{
-                        e.setProvide(e.getProvide() + 1);
-                        couponCustomer.setCouponId(e.getId());
-                        couponCustomerService.save(couponCustomer);
-                        couponService.updateById(e);
-                    });
-
-                    Customer customer = customerService.query().eq(Customer::getOpenId, customerCoupon.getOpenId()).entity(e -> e);
-                    customer.setSum(customer.getSum().add(new BigDecimal("1")));
-                    payRecordService.create(customer, new BigDecimal("1"), PayTypeEnum.CONSUME, PayTypeEnum.NEGATIVE, PayTypeEnum.WX);
-
-                }
+                    couponPayService. callBack(map);
                 //通知微信服务器已经支付成功
                 resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
                         + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
@@ -206,4 +160,6 @@ public class CouponPayController extends SuperController {
         out.flush();
         out.close();
     }
+
+
 }

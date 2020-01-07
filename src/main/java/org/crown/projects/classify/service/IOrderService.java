@@ -63,5 +63,11 @@ public interface IOrderService extends BaseService<Order> {
 
     void deleteOrder(Integer orderId, String openId);
 
+    /**
+     * 根据订单号查询订单
+     * @param orderNum
+     * @return
+     */
+    Order getByOrderNum(String orderNum);
 
 }

@@ -16,9 +16,7 @@ import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.entity.Order;
 import org.crown.projects.classify.service.IOrderService;
-import org.crown.projects.mine.model.entity.Customer;
-import org.crown.projects.mine.service.ICustomerService;
-import org.crown.projects.pay.service.IPayRecordService;
+import org.crown.projects.pay.service.IPayService;
 import org.crown.projects.pay.utlis.PayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,13 +37,12 @@ import java.util.Map;
 @RequestMapping(value = "/wxServices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
 public class PayController extends SuperController {
-    @Autowired
-    private ICustomerService customerService;
 
     @Autowired
     private IOrderService orderService;
+
     @Autowired
-    private IPayRecordService payRecordService;
+    private IPayService payService;
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "请求支付接口")
@@ -55,7 +51,7 @@ public class PayController extends SuperController {
             @ApiImplicitParam(name = "payType", value = "支付类型(0:微信支付,1:微信支付)", required = true, paramType = "body")
     })
     @PostMapping(value = "/wxPay/{id}")
-    public ApiResponses<JSONObject> wxPay(@PathVariable("id") Integer orderId,   @RequestBody Integer payType) {
+    public ApiResponses<JSONObject> wxPay(@PathVariable("id") Integer orderId, @RequestBody Integer payType) {
 
         try {
             String openId = JWTUtils.getOpenId(getToken());
@@ -63,17 +59,7 @@ public class PayController extends SuperController {
             order.setPaymentType(payType);
             if (payType.equals(PayTypeEnum.YE.value())) {
                 //余额支付 查询用户的余额是否满足订单金额，如果不满足返回异常，如果满足则减少
-                Customer customer = customerService.query().eq(Customer::getOpenId, openId).getOne();
-                if (customer.getBonus().compareTo(order.getTotalFee()) > -1) {
-                    customer.setBonus(customer.getBonus().subtract(order.getTotalFee()));
-                    customer.setLastTime(LocalDateTime.now());
-                    customer.setSum(customer.getSum().add(order.getTotalFee()));
-                    customer.setOrderNum(customer.getOrderNum() + 1);
-                    order.setStatus(OrderStatusEnum.PAY_UP.value());
-                    order.setPayTime(LocalDateTime.now());
-                    customerService.updateById(customer);
-                    orderService.updateById(order);
-                    payRecordService.create(customer, order.getTotalFee(), PayTypeEnum.CONSUME, PayTypeEnum.NEGATIVE, PayTypeEnum.YE);
+                if (payService.bonusPay(openId, order)) {
                     return success(HttpStatus.OK, null);
                 } else {
                     return success(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE, null);
@@ -111,7 +97,7 @@ public class PayController extends SuperController {
                         + "<nonce_str>" + nonce_str + "</nonce_str>"
                         + "<notify_url>" + WxApiEnum.WX_PAY_BACK_API.value() + "</notify_url>"
                         + "<openid>" + JWTUtils.getOpenId(getToken()) + "</openid>"
-                        + "<out_trade_no>" + orderId + "</out_trade_no>"
+                        + "<out_trade_no>" + order.getOrderNum() + "</out_trade_no>"
                         + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
                         + "<total_fee>" + 1 + "</total_fee>"//支付的金额，单位：分
                         + "<trade_type>" + TRADETYPE + "</trade_type>"
@@ -147,6 +133,7 @@ public class PayController extends SuperController {
         return null;
     }
 
+
     //这里是支付回调接口，微信支付成功后会自动调用
     @Resources(auth = AuthTypeEnum.OPEN)
     @PostMapping(value = "/wxNotify")
@@ -171,20 +158,10 @@ public class PayController extends SuperController {
             if (PayUtil.verify(prestr, (String) map.get("sign"), key, "utf-8")) {
                 /*此处添加自己的业务逻辑代码start*/
                 //注意要判断微信支付重复回调，支付成功后微信会重复的进行回调
-                LocalDateTime now = LocalDateTime.now();
-                int orderId = Integer.parseInt(map.get("out_trade_no").toString());
-                Order order = orderService.getById(orderId);
-                if (order.getStatus().equals(OrderStatusEnum.INIT)) {
-                    order.setStatus(OrderStatusEnum.PAY_UP.value());
-                    order.setPayTime(now);
-
-                    Customer customer = customerService.getById(order.getCustomerId());
-                    customer.setLastTime(now);
-                    customer.setSum(customer.getSum().add(order.getTotalFee()));
-                    customer.setOrderNum(customer.getOrderNum() + 1);
-                    orderService.updateById(order);
-                    customerService.updateById(customer);
-                    payRecordService.create(customer, order.getTotalFee(), PayTypeEnum.CONSUME, PayTypeEnum.NEGATIVE, PayTypeEnum.WX);
+                String orderNum = map.get("out_trade_no").toString();
+                Order order = orderService.getByOrderNum(orderNum);
+                if (order.getStatus().equals(OrderStatusEnum.INIT.value())) {
+                    payService.afterPay(order);
                 }
                 //通知微信服务器已经支付成功
                 resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"

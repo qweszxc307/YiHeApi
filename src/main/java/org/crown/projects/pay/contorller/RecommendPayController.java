@@ -16,9 +16,9 @@ import org.crown.framework.controller.SuperController;
 import org.crown.framework.responses.ApiResponses;
 import org.crown.projects.classify.model.entity.Order;
 import org.crown.projects.classify.service.IOrderService;
-import org.crown.projects.main.service.IRecommendCustomerService;
 import org.crown.projects.mine.model.entity.Customer;
 import org.crown.projects.mine.service.ICustomerService;
+import org.crown.projects.pay.service.IPayService;
 import org.crown.projects.pay.service.IRecommendPayService;
 import org.crown.projects.pay.utlis.PayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +49,10 @@ public class RecommendPayController extends SuperController {
 
     @Autowired
     private IRecommendPayService recommendPayService;
-
     @Autowired
-    private IRecommendCustomerService recommendCustomerService;
+    private IPayService payService;
+
+
 
     @Resources(auth = AuthTypeEnum.AUTH)
     @ApiOperation(value = "分享返礼请求支付接口")
@@ -65,18 +66,9 @@ public class RecommendPayController extends SuperController {
             String openId = JWTUtils.getOpenId(getToken());
             Order order = orderService.getById(orderId);
             order.setPaymentType(payType);
-            if (payType == 1) {
+            if (payType.equals(PayTypeEnum.YE.value())) {
                 //余额支付 查询用户的余额是否满足订单金额，如果不满足返回异常，如果满足则减少
-                Customer customer = customerService.query().eq(Customer::getOpenId, openId).entity(e->e);
-                if (customer.getBonus().compareTo(order.getTotalFee()) > -1) {
-                    customer.setBonus(customer.getBonus().subtract(order.getTotalFee()));
-                    customer.setLastTime(LocalDateTime.now());
-                    customer.setSum(customer.getSum().add(order.getTotalFee()));
-                    customer.setOrderNum(customer.getOrderNum() + 1);
-                    order.setStatus(OrderStatusEnum.PAY_UP.value());
-                    order.setPayTime(LocalDateTime.now());
-                    customerService.updateById(customer);
-                    orderService.updateById(order);
+                if (payService.bonusPay(openId, order)) {
                     recommendPayService.returnBuyMoney(orderId);
                     return success(HttpStatus.OK, null);
                 } else {
@@ -95,7 +87,7 @@ public class RecommendPayController extends SuperController {
                 packageParams.put("mch_id", mchId);
                 packageParams.put("nonce_str", nonce_str);
                 packageParams.put("body", body);
-                packageParams.put("out_trade_no", orderId + "");//商户订单号,自己的订单ID
+                packageParams.put("out_trade_no", order.getOrderNum() + "");//商户订单号,自己的订单ID
                 packageParams.put("total_fee", 1 + "");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
                 packageParams.put("spbill_create_ip", spbill_create_ip);
                 packageParams.put("notify_url", WxApiEnum.WX_RECOMMEND_BACK_API.value());//支付成功后的回调地址
@@ -114,7 +106,7 @@ public class RecommendPayController extends SuperController {
                         + "<nonce_str>" + nonce_str + "</nonce_str>"
                         + "<notify_url>" + WxApiEnum.WX_RECOMMEND_BACK_API.value() + "</notify_url>"
                         + "<openid>" + JWTUtils.getOpenId(getToken()) + "</openid>"
-                        + "<out_trade_no>" + orderId + "</out_trade_no>"
+                        + "<out_trade_no>" + order.getOrderNum() + "</out_trade_no>"
                         + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
                         + "<total_fee>" + 1 + "</total_fee>"//支付的金额，单位：分
                         + "<trade_type>" + TRADETYPE + "</trade_type>"
@@ -280,20 +272,13 @@ public class RecommendPayController extends SuperController {
             if (PayUtil.verify(prestr, (String) map.get("sign"), key, "utf-8")) {
                 /*此处添加自己的业务逻辑代码start*/
                 //注意要判断微信支付重复回调，支付成功后微信会重复的进行回调
-                LocalDateTime now = LocalDateTime.now();
-                int orderId = Integer.parseInt(map.get("out_trade_no").toString());
-                Order order = orderService.getById(orderId);
+                String orderNum = map.get("out_trade_no").toString();
+                Order order = orderService.getByOrderNum(orderNum);
                 if (order.getStatus().equals(OrderStatusEnum.INIT.value())) {
-                    order.setStatus(OrderStatusEnum.PAY_UP.value());
-                    order.setPayTime(now);
-                    orderService.updateById(order);
-                    Customer customer = customerService.getById(order.getCustomerId());
-                    customer.setLastTime(now);
-                    customer.setSum(customer.getSum().add(order.getTotalFee()));
-                    customer.setOrderNum(customer.getOrderNum() + 1);
-                    customerService.updateById(customer);
+                    payService.afterPay(order);
                 }
-                recommendPayService.returnBuyMoney(orderId);
+                recommendPayService.returnBuyMoney(order.getId());
+
                 //通知微信服务器已经支付成功
                 resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
                         + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
@@ -336,18 +321,10 @@ public class RecommendPayController extends SuperController {
             if (PayUtil.verify(prestr, (String) map.get("sign"), key, "utf-8")) {
                 /*此处添加自己的业务逻辑代码start*/
                 //注意要判断微信支付重复回调，支付成功后微信会重复的进行回调
-                LocalDateTime now = LocalDateTime.now();
                 String curOrderCode = map.get("out_trade_no").toString();
-                Order order = orderService.query().eq(Order::getOrderNum,curOrderCode).entity(e->e);
+                Order order = orderService.getByOrderNum(curOrderCode);
                 if (order.getStatus().equals(OrderStatusEnum.INIT.value())) {
-                    order.setStatus(OrderStatusEnum.PAY_UP.value());
-                    order.setPayTime(now);
-                    orderService.updateById(order);
-                    Customer customer = customerService.getById(order.getCustomerId());
-                    customer.setLastTime(now);
-                    customer.setSum(customer.getSum().add(order.getTotalFee()));
-                    customer.setOrderNum(customer.getOrderNum() + 1);
-                    customerService.updateById(customer);
+                    payService.afterPay(order);
                     recommendPayService.returnSendMoney(order.getId());
                 }
                 //通知微信服务器已经支付成功

@@ -285,6 +285,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderMapper, Order> implem
         orderLogisticsService.removeById(entity);
         removeById(orderId);
     }
+
+
+    @Override
+    public Order getByOrderNum(String orderNum) {
+        return query().eq(Order::getOrderNum, orderNum).entity(e -> e);
+    }
+
 }
 
 
